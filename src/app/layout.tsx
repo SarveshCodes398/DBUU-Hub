@@ -17,16 +17,15 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="min-h-screen bg-[#0b0710] text-[#fff8e9] flex flex-col selection:bg-[#ffc16b] selection:text-black relative">
-        {/* Global Celestial Castle Background Image */}
+        {/* Global Fixed Celestial Realm Background - High Res Smooth Scene */}
         <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
           <img 
-            src="/assets/background.jpg" 
+            src="/assets/d3d3a.png" 
             alt="DBUU Celestial Realm" 
             className="w-full h-full object-cover scale-[1.03] animate-pulse-subtle"
           />
-          {/* Selective blur & ambient tint overlay for readability */}
-          <div className="absolute inset-0 bg-[#0b0710]/65 backdrop-blur-[5px]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0b0710]/40 to-[#0b0710]/90" />
+          {/* Subtle atmospheric vignette so cards and text remain readable without turning the page black */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/50 pointer-events-none" />
         </div>
 
         {/* Top Navbar */}
@@ -35,7 +34,7 @@ export default function RootLayout({
         </div>
         
         {/* Main Content Area */}
-        <main className="flex-1 relative z-10">
+        <main className="flex-1 relative z-10 bg-transparent">
           {children}
         </main>
         

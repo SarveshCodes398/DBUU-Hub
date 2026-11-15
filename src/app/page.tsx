@@ -99,7 +99,7 @@ export default function HomePage() {
           }
         });
       },
-      { threshold: 0.18 }
+      { threshold: 0.16 }
     );
 
     document
@@ -121,7 +121,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className="relative bg-[#0b0710] text-[#fff8e9] overflow-hidden">
+    <main className="relative bg-transparent text-[#fff8e9] overflow-hidden">
       
       {/* Top Scroll Indicator Progress Line */}
       <div className="fixed inset-x-0 top-0 z-50 h-[2px] bg-white/10" aria-hidden="true">
@@ -132,9 +132,9 @@ export default function HomePage() {
       </div>
 
       <section className="scene" aria-label="DBUU University Hub">
-        {/* Sticky Visual Background Scene using uploaded high-res image */}
+        {/* Fixed Visual Background Scene using high-res d3d3a.png from scroll don */}
         <div className="scene__visual" aria-hidden="true">
-          <img src="/assets/background.jpg" alt="DBUU Celestial Realm" />
+          <img src="/assets/d3d3a.png" alt="DBUU Celestial Realm" />
           <div className="scene__veil" />
           <div className="scene__glow" />
         </div>
@@ -177,19 +177,24 @@ export default function HomePage() {
         </div>
 
         {/* Chapters Story Section with alternating smooth card entrances */}
-        <div id="story" className="relative z-10">
+        <div id="story" className="relative z-10 w-full">
           {chapters.map((chapter, index) => {
-            // First card pops in from left, second from right, third from left, fourth from right
-            const isLeftEntrance = index % 2 === 0;
+            // First card (index 0) on left, second (index 1) on right, third on left, fourth on right
+            const isRightSide = chapter.align === "right";
+
             return (
               <section
-                className={`chapter chapter--${chapter.align}`}
-                id={index === 1 ? "dance-ikon" : index === 2 ? "confessions" : undefined}
                 key={chapter.number}
+                id={index === 1 ? "dance-ikon" : index === 2 ? "confessions" : undefined}
+                className={`chapter-wrapper w-full flex items-center ${
+                  isRightSide ? "justify-end" : "justify-start"
+                }`}
               >
                 <article 
-                  className="chapter__card" 
-                  {...(isLeftEntrance ? { 'data-reveal-left': '' } : { 'data-reveal-right': '' })}
+                  className={`chapter__card w-full ${
+                    isRightSide ? "ml-auto mr-0" : "mr-auto ml-0"
+                  }`} 
+                  {...(isRightSide ? { 'data-reveal-right': '' } : { 'data-reveal-left': '' })}
                 >
                   <div className="chapter__meta">
                     <span>{chapter.number}</span>
@@ -209,7 +214,7 @@ export default function HomePage() {
                             key={i}
                             href={sub.href}
                             onClick={() => sounds.playClick()}
-                            className="flex items-center gap-2 p-2 rounded-lg bg-black/40 hover:bg-black/60 border border-white/10 text-[#ffc16b] hover:text-white transition-all backdrop-blur-sm"
+                            className="flex items-center gap-2 p-2.5 rounded-xl bg-black/40 hover:bg-black/60 border border-white/10 text-[#ffc16b] hover:text-white transition-all backdrop-blur-md"
                           >
                             <SubIcon className="w-3.5 h-3.5" />
                             <span>{sub.name}</span>
@@ -234,7 +239,7 @@ export default function HomePage() {
                       <Link
                         href={chapter.secondaryLink}
                         onClick={() => sounds.playClick()}
-                        className="px-4 py-2.5 rounded-full border border-white/20 hover:border-[#ffc16b] text-xs font-bold text-gray-300 hover:text-white transition-all bg-black/25 backdrop-blur-sm"
+                        className="px-4 py-2.5 rounded-full border border-white/20 hover:border-[#ffc16b] text-xs font-bold text-gray-300 hover:text-white transition-all bg-black/30 backdrop-blur-md"
                       >
                         {chapter.secondaryText}
                       </Link>
@@ -273,7 +278,7 @@ export default function HomePage() {
             <Link
               href="/games"
               onClick={() => sounds.playClick()}
-              className="px-6 py-3 rounded-full border border-white/20 hover:border-[#ffc16b] text-xs font-bold text-gray-200 bg-black/30 backdrop-blur-sm"
+              className="px-6 py-3 rounded-full border border-white/20 hover:border-[#ffc16b] text-xs font-bold text-gray-200 bg-black/40 backdrop-blur-md"
             >
               Enter Games Arcade
             </Link>
