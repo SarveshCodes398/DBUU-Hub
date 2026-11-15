@@ -65,49 +65,49 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Navbar - always solid black */}
-      <header className="sticky top-0 z-40 w-full bg-black border-b border-white/10 py-3">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 flex items-center justify-between">
+      {/* Navbar - always solid black, responsive padding */}
+      <header className="sticky top-0 z-40 w-full bg-black border-b border-white/10 py-2.5 sm:py-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 md:px-10 flex items-center justify-between">
           
           {/* Minimalist Wordmark Logo */}
           <Link 
             href="/" 
             onClick={() => sounds.playClick()}
-            className="wordmark flex items-center gap-2 group focus:outline-none"
+            className="wordmark flex items-center gap-1.5 sm:gap-2 group focus:outline-none"
           >
-            <span>DBUU</span>
-            <span className="text-[#ffc16b] font-light">HUB</span>
+            <span className="text-lg sm:text-2xl font-bold tracking-wider">DBUU</span>
+            <span className="text-[#ffc16b] font-light text-lg sm:text-2xl">HUB</span>
           </Link>
 
           {/* Right Action Controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Direct Add Event quick pill */}
             <Link
               href="/events/new"
               onClick={() => sounds.playClick()}
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#ffc16b]/40 bg-[#ffc16b]/10 hover:bg-[#ffc16b]/20 text-[#ffc16b] text-[11px] font-semibold tracking-wider uppercase transition-all"
+              className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#ffc16b]/40 bg-[#ffc16b]/10 hover:bg-[#ffc16b]/20 text-[#ffc16b] text-[11px] font-semibold tracking-wider uppercase transition-all"
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>Add College Event</span>
             </Link>
 
-            {/* Login / Logout */}
+            {/* Login / Profile */}
             <Link
               href="/auth/login"
               onClick={() => sounds.playClick()}
-              className="p-2.5 rounded-full border border-white/20 bg-black/30 hover:border-[#ffc16b]/60 text-white/80 hover:text-white transition-all backdrop-blur-sm"
+              className="p-2 sm:p-2.5 rounded-full border border-white/20 bg-black/40 hover:border-[#ffc16b]/60 text-white/80 hover:text-white transition-all backdrop-blur-sm"
               title="Login / Register"
             >
-              <LogIn className="w-4 h-4" />
+              <LogIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </Link>
 
             {/* Audio Toggle */}
             <button
               onClick={toggleSound}
               title={soundActive ? "Mute Sound Effects" : "Enable Sound Effects"}
-              className="p-2.5 rounded-full border border-white/20 bg-black/30 hover:border-[#ffc16b]/60 text-white/80 hover:text-white transition-all backdrop-blur-sm"
+              className="p-2 sm:p-2.5 rounded-full border border-white/20 bg-black/40 hover:border-[#ffc16b]/60 text-white/80 hover:text-white transition-all backdrop-blur-sm"
             >
-              {soundActive ? <Volume2 className="w-4 h-4 text-[#ffc16b]" /> : <VolumeX className="w-4 h-4 text-gray-500" />}
+              {soundActive ? <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ffc16b]" /> : <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" />}
             </button>
 
             {/* Sidebar Drawer Trigger */}
@@ -124,7 +124,7 @@ export default function Navbar() {
                 <span />
                 <span />
               </div>
-              <span className="font-semibold text-[11px] tracking-[0.2em]">MENU</span>
+              <span className="font-semibold text-[10px] sm:text-[11px] tracking-[0.2em]">MENU</span>
             </button>
           </div>
         </div>
@@ -135,17 +135,17 @@ export default function Navbar() {
         <div className="fixed inset-0 z-50 flex justify-end">
           {/* Backdrop Blur */}
           <div 
-            className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity duration-300"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300"
             onClick={() => setSidebarOpen(false)}
           />
 
-          {/* Drawer Content */}
-          <div className="relative w-full max-w-md h-full bg-[#0d0813] border-l border-white/15 p-6 sm:p-8 flex flex-col justify-between shadow-2xl z-10 overflow-y-auto">
+          {/* Drawer Content - Responsive width for phones */}
+          <div className="relative w-full max-w-[92vw] sm:max-w-md h-full bg-[#0d0813] border-l border-white/15 p-5 sm:p-8 flex flex-col justify-between shadow-2xl z-10 overflow-y-auto no-scrollbar">
             
             {/* Drawer Header */}
             <div>
-              <div className="flex items-center justify-between pb-6 border-b border-white/10">
-                <div className="wordmark text-2xl">
+              <div className="flex items-center justify-between pb-5 border-b border-white/10">
+                <div className="wordmark text-xl sm:text-2xl">
                   DBUU<span className="text-[#ffc16b]">.</span>HUB
                 </div>
                 <button
@@ -157,7 +157,7 @@ export default function Navbar() {
               </div>
 
               {/* Navigation Items */}
-              <div className="py-6 space-y-2">
+              <div className="py-5 space-y-2">
                 {navLinks.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href;
@@ -166,7 +166,7 @@ export default function Navbar() {
                       key={item.name}
                       href={item.href}
                       onClick={handleLinkClick}
-                      className={`flex items-center justify-between p-3.5 rounded-xl border transition-all ${
+                      className={`flex items-center justify-between p-3 sm:p-3.5 rounded-xl border transition-all ${
                         item.highlight
                           ? 'border-[#ffc16b]/50 bg-[#ffc16b]/10 text-[#ffc16b]'
                           : isActive
@@ -174,23 +174,23 @@ export default function Navbar() {
                           : 'border-white/5 bg-white/[0.02] text-gray-300 hover:bg-white/[0.06] hover:text-white hover:border-white/20'
                       }`}
                     >
-                      <div className="flex items-center gap-3.5">
+                      <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-lg ${item.highlight ? 'bg-[#ffc16b]/20 text-[#ffc16b]' : 'bg-white/5 text-[#ffc16b]'}`}>
                           <Icon className="w-4 h-4" />
                         </div>
                         <div>
-                          <div className="text-sm font-bold flex items-center gap-2">
+                          <div className="text-xs sm:text-sm font-bold flex items-center gap-2">
                             <span>{item.name}</span>
                             {item.badge && (
-                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-mono">
+                              <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-mono">
                                 {item.badge}
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] text-gray-400 font-normal">{item.desc}</p>
+                          <p className="text-[10px] sm:text-[11px] text-gray-400 font-normal">{item.desc}</p>
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-gray-500" />
+                      <ChevronRight className="w-4 h-4 text-gray-500 shrink-0" />
                     </Link>
                   );
                 })}
@@ -198,7 +198,7 @@ export default function Navbar() {
             </div>
 
             {/* Drawer Footer */}
-            <div className="pt-6 border-t border-white/10 text-xs text-gray-500 space-y-3">
+            <div className="pt-5 border-t border-white/10 text-xs text-gray-500 space-y-3">
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors"
@@ -206,8 +206,8 @@ export default function Navbar() {
                 <LogOut className="w-4 h-4" />
                 <span>Logout</span>
               </button>
-              <p>Dev Bhoomi Uttarakhand University</p>
-              <div className="text-[11px] text-emerald-400 flex items-center gap-1.5 font-mono">
+              <p className="text-[11px] text-gray-500">Dev Bhoomi Uttarakhand University</p>
+              <div className="text-[10px] sm:text-[11px] text-emerald-400 flex items-center gap-1.5 font-mono">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span>Open-Source Campus Hub Live</span>
               </div>

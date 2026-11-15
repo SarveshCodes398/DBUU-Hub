@@ -99,7 +99,7 @@ export default function HomePage() {
           }
         });
       },
-      { threshold: 0.16 }
+      { threshold: 0.14 }
     );
 
     document
@@ -121,10 +121,10 @@ export default function HomePage() {
   };
 
   return (
-    <main className="relative bg-transparent text-[#fff8e9] overflow-hidden">
+    <main className="relative bg-transparent text-[#fff8e9] overflow-x-hidden">
       
       {/* Top Scroll Indicator Progress Line */}
-      <div className="fixed inset-x-0 top-0 z-50 h-[2px] bg-white/10" aria-hidden="true">
+      <div className="fixed inset-x-0 top-0 z-50 h-[2px] bg-white/10 pointer-events-none" aria-hidden="true">
         <div
           className="h-full origin-left bg-[#ffc16b] shadow-[0_0_18px_#ffc16b]"
           style={{ transform: `scaleX(${scrollProgress})` }}
@@ -132,7 +132,7 @@ export default function HomePage() {
       </div>
 
       <section className="scene" aria-label="DBUU University Hub">
-        {/* Fixed Visual Background Scene using high-res d3d3a.png from scroll don */}
+        {/* Fixed Visual Background Scene */}
         <div className="scene__visual" aria-hidden="true">
           <img src="/assets/d3d3a.png" alt="DBUU Celestial Realm" />
           <div className="scene__veil" />
@@ -142,9 +142,9 @@ export default function HomePage() {
         {/* Hero Section */}
         <div
           id="top"
-          className="hero relative z-10 flex min-h-[100svh] flex-col items-center justify-center px-6 text-center"
+          className="hero relative z-10 flex min-h-[100svh] flex-col items-center justify-center px-4 sm:px-6 text-center"
         >
-          <div className="hero__content">
+          <div className="hero__content w-full max-w-4xl mx-auto">
             <p className="hero__eyebrow">
               Dev Bhoomi Uttarakhand University
             </p>
@@ -152,7 +152,7 @@ export default function HomePage() {
             {/* Connection Hub heading where Hub is in black text with no yellow background */}
             <h1 className="tracking-tight">
               Connection
-              <span className="text-black italic ml-3">
+              <span className="text-black italic ml-2 sm:ml-3">
                 Hub
               </span>
             </h1>
@@ -176,7 +176,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Chapters Story Section with alternating smooth card entrances */}
+        {/* Chapters Story Section with responsive alternating entrances */}
         <div id="story" className="relative z-10 w-full">
           {chapters.map((chapter, index) => {
             // First card (index 0) on left, second (index 1) on right, third on left, fourth on right
@@ -186,13 +186,13 @@ export default function HomePage() {
               <section
                 key={chapter.number}
                 id={index === 1 ? "dance-ikon" : index === 2 ? "confessions" : undefined}
-                className={`chapter-wrapper w-full flex items-center ${
-                  isRightSide ? "justify-end" : "justify-start"
+                className={`chapter-wrapper w-full flex items-center justify-center ${
+                  isRightSide ? "md:justify-end" : "md:justify-start"
                 }`}
               >
                 <article 
-                  className={`chapter__card w-full ${
-                    isRightSide ? "ml-auto mr-0" : "mr-auto ml-0"
+                  className={`chapter__card w-full mx-auto ${
+                    isRightSide ? "md:ml-auto md:mr-0" : "md:mr-auto md:ml-0"
                   }`} 
                   {...(isRightSide ? { 'data-reveal-right': '' } : { 'data-reveal-left': '' })}
                 >
@@ -206,7 +206,7 @@ export default function HomePage() {
 
                   {/* Sublinks for Games chapter */}
                   {'sublinks' in chapter && chapter.sublinks && (
-                    <div className="mt-5 grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
                       {chapter.sublinks.map((sub, i) => {
                         const SubIcon = sub.icon;
                         return (
@@ -229,7 +229,7 @@ export default function HomePage() {
                     <Link
                       href={chapter.ctaLink}
                       onClick={() => sounds.playClick()}
-                      className="btn-cyber-primary px-6 py-2.5 text-xs font-bold flex items-center gap-2"
+                      className="btn-cyber-primary px-5 sm:px-6 py-2.5 text-xs font-bold flex items-center justify-center gap-2 w-full sm:w-auto"
                     >
                       <span>{chapter.ctaText}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -239,7 +239,7 @@ export default function HomePage() {
                       <Link
                         href={chapter.secondaryLink}
                         onClick={() => sounds.playClick()}
-                        className="px-4 py-2.5 rounded-full border border-white/20 hover:border-[#ffc16b] text-xs font-bold text-gray-300 hover:text-white transition-all bg-black/30 backdrop-blur-md"
+                        className="px-4 py-2.5 rounded-full border border-white/20 hover:border-[#ffc16b] text-xs font-bold text-gray-300 hover:text-white transition-all bg-black/30 backdrop-blur-md text-center w-full sm:w-auto"
                       >
                         {chapter.secondaryText}
                       </Link>
@@ -253,24 +253,24 @@ export default function HomePage() {
       </section>
 
       {/* Epilogue Section */}
-      <section className="epilogue relative z-20 flex min-h-[75svh] items-center justify-center overflow-hidden px-6 text-center">
+      <section className="epilogue relative z-20 flex min-h-[75svh] items-center justify-center overflow-hidden px-4 sm:px-6 text-center">
         <div className="epilogue__orb" aria-hidden="true" />
         <div className="relative max-w-3xl" data-reveal>
-          <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.34em] text-[#e9af67]">
+          <p className="mb-4 sm:mb-6 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.3em] text-[#e9af67]">
             Dev Bhoomi Uttarakhand University
           </p>
-          <h2 className="text-4xl leading-[1] font-light md:text-6xl lg:text-7xl">
+          <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.05] font-light">
             Created for Every Student.
           </h2>
-          <p className="mt-4 text-xs sm:text-sm text-gray-300 max-w-md mx-auto">
+          <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-300 max-w-md mx-auto leading-relaxed">
             Play mind sports, recruit your event dream team, publish college events, and share confessions with complete peace of mind.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-7 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-sm sm:max-w-none mx-auto">
             <Link
               href="/events/new"
               onClick={() => sounds.playClick()}
-              className="btn-cyber-primary px-6 py-3 text-xs font-bold flex items-center gap-2"
+              className="btn-cyber-primary px-6 py-3 text-xs font-bold flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <PlusCircle className="w-4 h-4" />
               <span>Host College Event</span>
@@ -278,7 +278,7 @@ export default function HomePage() {
             <Link
               href="/games"
               onClick={() => sounds.playClick()}
-              className="px-6 py-3 rounded-full border border-white/20 hover:border-[#ffc16b] text-xs font-bold text-gray-200 bg-black/40 backdrop-blur-md"
+              className="px-6 py-3 rounded-full border border-white/20 hover:border-[#ffc16b] text-xs font-bold text-gray-200 bg-black/40 backdrop-blur-md w-full sm:w-auto text-center"
             >
               Enter Games Arcade
             </Link>
