@@ -40,7 +40,7 @@ export default function LoginPage() {
   };
 
   const handleQuickDemoLogin = () => {
-    setEmail('aryan.vashistha@dbuu.ac.in');
+    setEmail('student@dbuu.ac.in');
     setPassword('DBUU-Student-2026');
     setSubmitting(true);
     sounds.playMove();

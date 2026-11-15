@@ -8,7 +8,7 @@ export const initialRecruitmentPosts: RecruitmentPost[] = [
     organizer: 'Department of Student Welfare & Cultural Council',
     department: 'School of Architecture, Design & Performing Arts',
     category: 'dance',
-    description: 'Dev Bhoomi Uttarakhand University’s biggest stage is back! DBUU Dance Ikon 2026 is recruiting energetic student coordinators, hospitality heads, backstage managers, and live media crew. Be part of the executive machinery behind Uttarakhand’s most electrifying dance extravaganza.',
+    description: 'Dev Bhoomi Uttarakhand University’s biggest stage is back! DBUU Dance Ikon 2026 is recruiting student coordinators, hospitality heads, backstage managers, and live media crew. Be part of the executive team behind Uttarakhand’s dance extravaganza.',
     rolesNeeded: [
       'Stage Operations & Green Room Manager',
       'VIP Guest & Celebrity Escort',
@@ -75,7 +75,7 @@ export const initialRecruitmentPosts: RecruitmentPost[] = [
     organizer: 'DBUU Sports Council',
     department: 'Physical Education & University Sports Board',
     category: 'sports',
-    description: 'Looking for energetic referees, first-aid liaisons, scorekeepers, and field managers for Football, Cricket, Basketball, and Track & Field tournaments.',
+    description: 'Looking for referees, first-aid liaisons, scorekeepers, and field managers for Football, Cricket, Basketball, and Track & Field tournaments.',
     rolesNeeded: [
       'Official Match Scorekeeper & Timekeeper',
       'First-Aid & Medical Assistance Liaison',
@@ -132,9 +132,9 @@ export const initialRecruitmentPosts: RecruitmentPost[] = [
 export const initialConfessions: Confession[] = [
   {
     id: 'conf-1',
-    content: 'To the CSE 3rd year girl in Section B who always wears the dark olive hoodie and sits by the window in Lab 4: your laugh literally brightens up our 8 AM compiler design classes. I am way too shy to say hi in person, so here it is.',
+    content: 'To the CSE 3rd year student in Section B who always wears the dark olive hoodie and sits by the window in Lab 4: your laugh literally brightens up our 8 AM compiler design classes. I am way too shy to say hi in person, so here it is.',
     category: 'crush',
-    authorAlias: 'Ghost In The Machine #104',
+    authorAlias: 'Anonymous Student #104',
     reactions: {
       love: 84,
       laugh: 12,
@@ -145,14 +145,14 @@ export const initialConfessions: Confession[] = [
     comments: [
       {
         id: 'c1-1',
-        authorAlias: 'Campus Whispers #31',
-        content: 'Bro just go ask her if she completed the lab assignment! Best ice breaker ever.',
+        authorAlias: 'Anonymous Student #31',
+        content: 'Go ask if they completed the lab assignment! Best ice breaker ever.',
         createdAt: '2 hours ago'
       },
       {
         id: 'c1-2',
-        authorAlias: 'Mystic Raven #88',
-        content: 'She is in section B and reads mystery novels during breaks! You got this bro 🚀',
+        authorAlias: 'Anonymous Student #88',
+        content: 'They are in section B and read mystery novels during breaks! You got this 🚀',
         createdAt: '1 hour ago'
       }
     ],
@@ -162,7 +162,7 @@ export const initialConfessions: Confession[] = [
     id: 'conf-2',
     content: 'Unpopular opinion: The Maggi and cold coffee at the DBUU backside canteen near the pharmacy block hits 10x harder than any fancy cafe in Rajpur road. Special salute to Uncle who always gives extra cheese without charging extra.',
     category: 'appreciation',
-    authorAlias: 'Midnight Foodie #22',
+    authorAlias: 'Anonymous Student #22',
     reactions: {
       love: 142,
       laugh: 3,
@@ -173,8 +173,8 @@ export const initialConfessions: Confession[] = [
     comments: [
       {
         id: 'c2-1',
-        authorAlias: 'Canteen Chronicler #09',
-        content: 'FACTS! Try his peri-peri paneer roll too, absolute peak food.',
+        authorAlias: 'Anonymous Student #09',
+        content: 'FACTS! Try the peri-peri paneer roll too, absolute peak food.',
         createdAt: '45 mins ago'
       }
     ],
@@ -184,7 +184,7 @@ export const initialConfessions: Confession[] = [
     id: 'conf-3',
     content: 'Shoutout to our hostel warden who caught 6 of us ordering Biryani at 1:30 AM over the gate, looked at us disappointed, said "Eat quietly and don\'t make noise", and walked away without writing a fine. You are a real legend Sir!',
     category: 'hostel',
-    authorAlias: 'Hostel Nightwalker #77',
+    authorAlias: 'Anonymous Student #77',
     reactions: {
       love: 210,
       laugh: 95,
@@ -195,8 +195,8 @@ export const initialConfessions: Confession[] = [
     comments: [
       {
         id: 'c3-1',
-        authorAlias: 'Wing 3 Room 402',
-        content: 'Block A warden is truly the goat 🐐',
+        authorAlias: 'Anonymous Student #402',
+        content: 'Block A warden is truly the best',
         createdAt: '1 hour ago'
       }
     ],
@@ -204,9 +204,9 @@ export const initialConfessions: Confession[] = [
   },
   {
     id: 'conf-4',
-    content: 'The DBUU Dance Ikon auditions are happening next week and the talent on campus is insane this year. Please tell me the choreography team is ready for the hip-hop crew coming from Dehradun colleges too!',
+    content: 'The DBUU Dance Ikon auditions are happening soon and the talent on campus is insane this year. Please tell me the choreography team is ready for the hip-hop crew coming from Dehradun colleges too!',
     category: 'campus-rant',
-    authorAlias: 'Beatbox Scribe #19',
+    authorAlias: 'Anonymous Student #19',
     reactions: {
       love: 67,
       laugh: 8,
@@ -221,7 +221,7 @@ export const initialConfessions: Confession[] = [
     id: 'conf-5',
     content: 'Whoever played Interstellar theme on the acoustic piano in the auditorium lobby during yesterday\'s rain while everyone was waiting under the shade: that was pure cinematic magic. Thank you.',
     category: 'appreciation',
-    authorAlias: 'Himalayan Wanderer #56',
+    authorAlias: 'Anonymous Student #56',
     reactions: {
       love: 189,
       laugh: 2,
@@ -232,8 +232,8 @@ export const initialConfessions: Confession[] = [
     comments: [
       {
         id: 'c5-1',
-        authorAlias: 'Audio Geek #12',
-        content: 'That was Rohan from Mechanical 2nd year! Dude is insanely gifted.',
+        authorAlias: 'Anonymous Student #12',
+        content: 'That was someone from Mechanical 2nd year! Truly gifted.',
         createdAt: '3 hours ago'
       }
     ],

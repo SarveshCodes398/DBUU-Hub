@@ -424,11 +424,11 @@ export default function MathBlitzPage() {
             </h3>
             <div className="space-y-2 text-xs font-mono">
               <div className="p-2.5 rounded-lg bg-surface-100 flex items-center justify-between border border-white/5">
-                <span className="text-gray-300">#1 Aryan V. (SOEC)</span>
+                <span className="text-gray-300">#1 Engineering Guild</span>
                 <span className="text-amber-400 font-bold">280 PTS</span>
               </div>
               <div className="p-2.5 rounded-lg bg-surface-100 flex items-center justify-between border border-white/5">
-                <span className="text-gray-300">#2 Priya N. (SoM)</span>
+                <span className="text-gray-300">#2 Management Division</span>
                 <span className="text-cyan-400 font-bold">240 PTS</span>
               </div>
               <div className="p-2.5 rounded-lg bg-surface-100 flex items-center justify-between border border-white/5">

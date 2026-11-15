@@ -1,22 +1,23 @@
-import { initialConfessions, initialRecruitmentPosts } from './data';
-import { Confession, RecruitmentPost, Application, StudentProfile } from './types';
+import { initialConfessions, initialRecruitmentPosts, campusEvents } from './data';
+import { Confession, RecruitmentPost, Application, StudentProfile, CampusEvent } from './types';
 
 // In-Memory store that persists per serverless instance lifecycle & can sync with MongoDB if configured
 class StoreManager {
   private confessions: Confession[] = [...initialConfessions];
   private recruitments: RecruitmentPost[] = [...initialRecruitmentPosts];
+  private events: CampusEvent[] = [...campusEvents];
   private applications: Application[] = [
     {
       id: 'app-sample-1',
       recruitmentId: 'dance-ikon-2026-volunteers',
-      studentId: 'dbuu-std-101',
-      studentName: 'Aarav Sharma',
+      studentId: 'std-volunteer-01',
+      studentName: 'Student Applicant',
       studentRoll: '23BCSE102',
       studentDept: 'Computer Science & Engineering',
       studentPhone: '+91 98765 43210',
-      studentEmail: 'aarav.sharma@dbuu.ac.in',
+      studentEmail: 'student@dbuu.ac.in',
       roleApplied: 'Sound, Lighting & Console Crew',
-      experience: 'Managed audio console during school annual fest and fresher welcome 2024.',
+      experience: 'Managed audio console during school annual fest and fresher welcome.',
       whyJoin: 'Passionate about live acoustics, want to contribute to the university flagship event.',
       status: 'shortlisted',
       submittedAt: '2026-02-11T14:20:00Z'
@@ -28,12 +29,12 @@ class StoreManager {
       'demo@dbuu.ac.in',
       {
         id: 'user-demo-1',
-        name: 'Aryan Vashistha',
+        name: 'Student',
         email: 'demo@dbuu.ac.in',
         rollNumber: '23BCSE042',
         department: 'School of Engineering & Computing',
-        year: '3rd Year (B.Tech CSE)',
-        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Aryan',
+        year: '3rd Year',
+        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Student',
         xp: 1450,
         level: 4,
         role: 'student',
@@ -44,6 +45,21 @@ class StoreManager {
     ]
   ]);
 
+  // EVENTS (Every student has access to add college events)
+  public getEvents(): CampusEvent[] {
+    return this.events;
+  }
+
+  public addEvent(evt: Omit<CampusEvent, 'id' | 'registrationOpen'>): CampusEvent {
+    const newEvent: CampusEvent = {
+      ...evt,
+      id: `evt-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      registrationOpen: true
+    };
+    this.events.unshift(newEvent);
+    return newEvent;
+  }
+
   // CONFESSIONS
   public getConfessions(): Confession[] {
     return this.confessions.filter(c => !c.isFlagged);
@@ -51,9 +67,7 @@ class StoreManager {
 
   public addConfession(content: string, category: Confession['category'], customAlias?: string): Confession {
     const randomNum = Math.floor(100 + Math.random() * 900);
-    const prefixes = ['Mystic Raven', 'Neon Falcon', 'Cipher Student', 'Shadow Owl', 'Quantum Sage', 'Shivalik Breeze'];
-    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-    const alias = customAlias?.trim() ? customAlias.trim() : `${prefix} #${randomNum}`;
+    const alias = customAlias?.trim() ? customAlias.trim() : `Anonymous Student #${randomNum}`;
 
     const newConfession: Confession = {
       id: `conf-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
@@ -89,7 +103,7 @@ class StoreManager {
     if (!confession) return null;
 
     const randomNum = Math.floor(10 + Math.random() * 90);
-    const alias = customAlias?.trim() ? customAlias.trim() : `Fellow Student #${randomNum}`;
+    const alias = customAlias?.trim() ? customAlias.trim() : `Anonymous Student #${randomNum}`;
     const comment = {
       id: `cmt-${Date.now()}`,
       authorAlias: alias,

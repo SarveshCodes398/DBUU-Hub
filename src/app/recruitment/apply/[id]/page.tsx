@@ -29,11 +29,11 @@ export default function RecruitmentApplyPage() {
   const [submittedAppId, setSubmittedAppId] = useState<string | null>(null);
 
   // Form states
-  const [studentName, setStudentName] = useState('Aryan Vashistha');
-  const [studentRoll, setStudentRoll] = useState('23BCSE042');
-  const [studentDept, setStudentDept] = useState('School of Engineering & Computing');
-  const [studentPhone, setStudentPhone] = useState('+91 98765 43210');
-  const [studentEmail, setStudentEmail] = useState('demo@dbuu.ac.in');
+  const [studentName, setStudentName] = useState('');
+  const [studentRoll, setStudentRoll] = useState('');
+  const [studentDept, setStudentDept] = useState('');
+  const [studentPhone, setStudentPhone] = useState('');
+  const [studentEmail, setStudentEmail] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
   const [experience, setExperience] = useState('');
   const [whyJoin, setWhyJoin] = useState('');

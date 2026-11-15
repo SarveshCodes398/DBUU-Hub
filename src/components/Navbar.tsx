@@ -7,23 +7,21 @@ import {
   Gamepad2, 
   Users, 
   EyeOff, 
-  Sparkles, 
   Calendar, 
   BookOpen, 
-  Cpu, 
   Volume2, 
   VolumeX, 
-  Menu, 
   X, 
   ChevronRight,
-  ShieldCheck,
+  PlusCircle,
+  Home,
   UserCheck
 } from 'lucide-react';
 import { sounds } from '@/lib/utils';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [soundActive, setSoundActive] = useState(true);
   const [scrolled, setScrolled] = useState(false);
 
@@ -35,6 +33,15 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close sidebar on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSidebarOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const toggleSound = () => {
     const next = !soundActive;
     setSoundActive(next);
@@ -43,176 +50,159 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { name: 'Hub Home', href: '/', icon: Sparkles },
-    { name: 'Games Arcade', href: '/games', icon: Gamepad2, highlight: true },
-    { name: 'Recruitment & Volunteering', href: '/recruitment', icon: Users, badge: 'Dance Ikon 2026' },
-    { name: 'Anonymous Confessions', href: '/confessions', icon: EyeOff },
-    { name: 'Campus Events', href: '/events', icon: Calendar },
-    { name: 'Study Vault', href: '/vault', icon: BookOpen },
-    { name: 'Vercel Benchmark', href: '/benchmark', icon: Cpu, techBadge: 'Stress Test' },
+    { name: 'Hub Home', href: '/', icon: Home, desc: 'Central University Scene' },
+    { name: 'Games Arcade', href: '/games', icon: Gamepad2, desc: 'Chess, Ludo, Sudoku, Speed Math', badge: 'Play AI & PvP' },
+    { name: 'Volunteering & Recruitment', href: '/recruitment', icon: Users, desc: 'DBUU Dance Ikon 2026 & Crews', badge: 'Dance Ikon' },
+    { name: 'Anonymous Confessions', href: '/confessions', icon: EyeOff, desc: '100% Identity Protected Whispers' },
+    { name: 'College Events', href: '/events', icon: Calendar, desc: 'Fests, Conclaves & Campus Meets' },
+    { name: 'Add College Event', href: '/events/new', icon: PlusCircle, desc: 'Open for every student to host', highlight: true },
+    { name: 'Academic Vault', href: '/vault', icon: BookOpen, desc: 'Notes, Syllabus & PYQ Papers' },
+    { name: 'Student Profile', href: '/profile', icon: UserCheck, desc: 'Student Passport & Game Stats' },
   ];
 
   const handleLinkClick = () => {
     sounds.playClick();
-    setMobileMenuOpen(false);
+    setSidebarOpen(false);
   };
 
   return (
-    <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-      scrolled 
-        ? 'glass-panel border-b border-cyan-500/20 shadow-lg shadow-cyan-950/20 py-2.5' 
-        : 'bg-background/80 backdrop-blur-md border-b border-white/5 py-4'
-    }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
+    <>
+      <header className={`sticky top-0 z-40 w-full transition-all duration-300 ${
+        scrolled 
+          ? 'bg-[#0b0710]/90 backdrop-blur-md border-b border-white/10 py-3' 
+          : 'bg-transparent py-5'
+      }`}>
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 flex items-center justify-between">
           
-          {/* Logo / Brand with IIT E-Summit style tech badge */}
+          {/* Minimalist Wordmark Logo */}
           <Link 
             href="/" 
-            onClick={handleLinkClick}
-            className="flex items-center gap-3 group focus:outline-none"
+            onClick={() => sounds.playClick()}
+            className="wordmark flex items-center gap-2 group focus:outline-none"
           >
-            <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 via-blue-600 to-purple-600 p-[1.5px] transition-transform duration-300 group-hover:scale-105 shadow-neon-cyan">
-              <div className="w-full h-full bg-[#070A12] rounded-xl flex items-center justify-center overflow-hidden">
-                <span className="font-mono font-black text-transparent bg-clip-text bg-gradient-to-tr from-cyan-400 to-purple-400 text-lg">
-                  DB
-                </span>
-              </div>
-            </div>
-            
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold tracking-wider text-white text-base sm:text-lg group-hover:text-cyan-300 transition-colors">
-                  DBUU<span className="text-cyan-400">.</span>HUB
-                </span>
-                <span className="text-[10px] uppercase font-mono tracking-widest px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
-                  NEXUS
-                </span>
-              </div>
-              <span className="text-[10px] text-gray-400 font-medium tracking-tight">
-                Dev Bhoomi Uttarakhand University
-              </span>
-            </div>
+            <span>DBUU</span>
+            <span className="text-[#ffc16b] font-light">HUB</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1.5 xl:gap-2">
-            {navLinks.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
-              
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => sounds.playClick()}
-                  className={`relative px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 flex items-center gap-1.5 group ${
-                    isActive
-                      ? 'text-cyan-300 bg-cyan-950/40 border border-cyan-500/30 shadow-[0_0_12px_rgba(0,240,255,0.2)]'
-                      : 'text-gray-300 hover:text-white hover:bg-white/5 border border-transparent'
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 transition-transform group-hover:scale-110 ${isActive ? 'text-cyan-400' : 'text-gray-400'}`} />
-                  <span>{item.name}</span>
-                  {item.badge && (
-                    <span className="text-[9px] bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold px-1.5 py-0.2 rounded-full animate-pulse">
-                      {item.badge}
-                    </span>
-                  )}
-                  {item.techBadge && (
-                    <span className="text-[9px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-1 rounded">
-                      {item.techBadge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+          {/* Right Action Controls: No text names on top! Just Sound, Add Event, and Sidebar Button */}
+          <div className="flex items-center gap-3">
+            {/* Direct Add Event quick pill */}
+            <Link
+              href="/events/new"
+              onClick={() => sounds.playClick()}
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#ffc16b]/40 bg-[#ffc16b]/10 hover:bg-[#ffc16b]/20 text-[#ffc16b] text-[11px] font-semibold tracking-wider uppercase transition-all"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>Add College Event</span>
+            </Link>
 
-          {/* Right Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-3">
             {/* Audio Toggle */}
             <button
               onClick={toggleSound}
               title={soundActive ? "Mute Sound Effects" : "Enable Sound Effects"}
-              className="p-2 rounded-lg bg-surface-100 hover:bg-surface-200 border border-white/10 text-gray-400 hover:text-cyan-300 transition-colors"
+              className="p-2.5 rounded-full border border-white/20 bg-black/30 hover:border-[#ffc16b]/60 text-white/80 hover:text-white transition-all backdrop-blur-sm"
             >
-              {soundActive ? <Volume2 className="w-4 h-4 text-cyan-400" /> : <VolumeX className="w-4 h-4 text-gray-500" />}
+              {soundActive ? <Volume2 className="w-4 h-4 text-[#ffc16b]" /> : <VolumeX className="w-4 h-4 text-gray-500" />}
             </button>
 
-            {/* Quick Profile / Student Passport Link */}
-            <Link
-              href="/profile"
-              onClick={() => sounds.playClick()}
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-gray-200 transition-all"
-            >
-              <div className="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-[10px] font-bold text-white">
-                D
-              </div>
-              <span>Student ID</span>
-            </Link>
-
-            {/* Auth / Demo Entry Button */}
-            <Link
-              href="/auth/login"
-              onClick={() => sounds.playClick()}
-              className="btn-cyber-primary px-3.5 py-1.5 text-xs flex items-center gap-1.5"
-            >
-              <UserCheck className="w-3.5 h-3.5" />
-              <span>Portal Entry</span>
-            </Link>
-
-            {/* Mobile Hamburger */}
+            {/* Sidebar Drawer Trigger */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg bg-surface-100 border border-white/10 text-gray-300 hover:text-white"
+              onClick={() => {
+                setSidebarOpen(true);
+                sounds.playClick();
+              }}
+              className="menu-button"
+              type="button"
+              aria-label="Open Navigation Sidebar"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              <div className="hamburger-lines">
+                <span />
+                <span />
+              </div>
+              <span className="font-semibold text-[11px] tracking-[0.2em]">MENU</span>
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Mobile Dropdown Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden mt-3 pt-3 pb-4 border-t border-white/10 grid grid-cols-1 gap-1.5">
-            {navLinks.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={handleLinkClick}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/30'
-                      : 'text-gray-300 hover:bg-white/5 hover:text-white'
-                  }`}
+      {/* Cyberpunk Sidebar Drawer Overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          {/* Backdrop Blur */}
+          <div 
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setSidebarOpen(false)}
+          />
+
+          {/* Drawer Content */}
+          <div className="relative w-full max-w-md h-full bg-[#0d0813] border-l border-white/15 p-6 sm:p-8 flex flex-col justify-between shadow-2xl z-10 overflow-y-auto">
+            
+            {/* Drawer Header */}
+            <div>
+              <div className="flex items-center justify-between pb-6 border-b border-white/10">
+                <div className="wordmark text-2xl">
+                  DBUU<span className="text-[#ffc16b]">.</span>HUB
+                </div>
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  className="p-2 rounded-full border border-white/20 hover:border-[#ffc16b] text-gray-400 hover:text-white transition-all"
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon className="w-4 h-4 text-cyan-400" />
-                    <span>{item.name}</span>
-                  </div>
-                  {item.badge ? (
-                    <span className="text-[10px] bg-rose-500/30 text-rose-300 border border-rose-500/40 px-2 py-0.5 rounded-full">
-                      {item.badge}
-                    </span>
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-gray-500" />
-                  )}
-                </Link>
-              );
-            })}
-            <div className="pt-2 mt-2 border-t border-white/10 flex justify-between items-center px-2">
-              <span className="text-xs text-gray-400">Dev Bhoomi Uttarakhand University</span>
-              <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block"></span>
-                Vercel Edge Live
-              </span>
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Navigation Items */}
+              <div className="py-6 space-y-2">
+                {navLinks.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={handleLinkClick}
+                      className={`flex items-center justify-between p-3.5 rounded-xl border transition-all ${
+                        item.highlight
+                          ? 'border-[#ffc16b]/50 bg-[#ffc16b]/10 text-[#ffc16b]'
+                          : isActive
+                          ? 'border-[#ffc16b]/40 bg-white/10 text-white'
+                          : 'border-white/5 bg-white/[0.02] text-gray-300 hover:bg-white/[0.06] hover:text-white hover:border-white/20'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className={`p-2 rounded-lg ${item.highlight ? 'bg-[#ffc16b]/20 text-[#ffc16b]' : 'bg-white/5 text-[#ffc16b]'}`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold flex items-center gap-2">
+                            <span>{item.name}</span>
+                            {item.badge && (
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-mono">
+                                {item.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-gray-400 font-normal">{item.desc}</p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-gray-500" />
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Drawer Footer */}
+            <div className="pt-6 border-t border-white/10 text-xs text-gray-500 space-y-2">
+              <p>Dev Bhoomi Uttarakhand University</p>
+              <div className="text-[11px] text-emerald-400 flex items-center gap-1.5 font-mono">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Open-Source Campus Hub Live</span>
+              </div>
             </div>
           </div>
-        )}
-      </div>
-    </header>
+        </div>
+      )}
+    </>
   );
 }
