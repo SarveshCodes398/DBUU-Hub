@@ -15,7 +15,9 @@ import {
   ChevronRight,
   PlusCircle,
   Home,
-  UserCheck
+  UserCheck,
+  LogIn,
+  LogOut
 } from 'lucide-react';
 import { sounds } from '@/lib/utils';
 
@@ -23,15 +25,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [soundActive, setSoundActive] = useState(true);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Close sidebar on Escape key
   useEffect(() => {
@@ -65,13 +58,15 @@ export default function Navbar() {
     setSidebarOpen(false);
   };
 
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = '/';
+  };
+
   return (
     <>
-      <header className={`sticky top-0 z-40 w-full transition-all duration-300 ${
-        scrolled 
-          ? 'bg-[#0b0710]/90 backdrop-blur-md border-b border-white/10 py-3' 
-          : 'bg-transparent py-5'
-      }`}>
+      {/* Navbar - always solid black */}
+      <header className="sticky top-0 z-40 w-full bg-black border-b border-white/10 py-3">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 flex items-center justify-between">
           
           {/* Minimalist Wordmark Logo */}
@@ -84,7 +79,7 @@ export default function Navbar() {
             <span className="text-[#ffc16b] font-light">HUB</span>
           </Link>
 
-          {/* Right Action Controls: No text names on top! Just Sound, Add Event, and Sidebar Button */}
+          {/* Right Action Controls */}
           <div className="flex items-center gap-3">
             {/* Direct Add Event quick pill */}
             <Link
@@ -94,6 +89,16 @@ export default function Navbar() {
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>Add College Event</span>
+            </Link>
+
+            {/* Login / Logout */}
+            <Link
+              href="/auth/login"
+              onClick={() => sounds.playClick()}
+              className="p-2.5 rounded-full border border-white/20 bg-black/30 hover:border-[#ffc16b]/60 text-white/80 hover:text-white transition-all backdrop-blur-sm"
+              title="Login / Register"
+            >
+              <LogIn className="w-4 h-4" />
             </Link>
 
             {/* Audio Toggle */}
@@ -193,7 +198,14 @@ export default function Navbar() {
             </div>
 
             {/* Drawer Footer */}
-            <div className="pt-6 border-t border-white/10 text-xs text-gray-500 space-y-2">
+            <div className="pt-6 border-t border-white/10 text-xs text-gray-500 space-y-3">
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
               <p>Dev Bhoomi Uttarakhand University</p>
               <div className="text-[11px] text-emerald-400 flex items-center gap-1.5 font-mono">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>

@@ -20,7 +20,7 @@ export default function RootLayout({
         {/* Global Celestial Castle Background Image */}
         <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
           <img 
-            src="/assets/bg-castle.jpg" 
+            src="/assets/background.jpg" 
             alt="DBUU Celestial Realm" 
             className="w-full h-full object-cover scale-[1.03] animate-pulse-subtle"
           />

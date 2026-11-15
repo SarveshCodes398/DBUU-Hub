@@ -1,150 +1,119 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  UserPlus, 
-  Lock, 
-  Mail, 
-  ArrowRight, 
-  ShieldCheck, 
-  Sparkles, 
-  CheckCircle2, 
-  Building2, 
-  GraduationCap
-} from 'lucide-react';
-import { sounds, triggerConfetti } from '@/lib/utils';
+import Link from 'next/link';
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [name, setName] = useState('');
-  const [rollNumber, setRollNumber] = useState('');
-  const [department, setDepartment] = useState('School of Engineering & Computing');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    sounds.playMove();
+    setError('');
+    setLoading(true);
 
-    setTimeout(() => {
-      setSubmitting(false);
-      setSuccess(true);
-      sounds.playSuccess();
-      triggerConfetti();
-      setTimeout(() => {
-        router.push('/profile');
-      }, 700);
-    }, 600);
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Registration failed');
+        setLoading(false);
+        return;
+      }
+
+      // Success - redirect to home
+      router.push('/');
+      router.refresh();
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-12">
-      <div className="glass-panel-glow rounded-3xl p-8 border border-purple-500/30 relative overflow-hidden space-y-6">
-        <div className="absolute top-0 right-0 w-60 h-60 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-500 via-pink-600 to-cyan-400 p-[1.5px] mx-auto shadow-neon-purple">
-            <div className="w-full h-full bg-[#070A14] rounded-2xl flex items-center justify-center text-purple-400">
-              <UserPlus className="w-6 h-6" />
-            </div>
-          </div>
-
-          <h1 className="text-2xl font-black text-white">
-            STUDENT REGISTRATION
+    <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <div className="w-full max-w-md glass-panel rounded-2xl p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-light font-['Cormorant_Garamond'] text-[#fff8e9]">
+            Join <span className="text-[#ffc16b]">DBUU Hub</span>
           </h1>
-          <p className="text-xs text-gray-400">
-            Create your unified DBUU Hub digital identity
-          </p>
+          <p className="text-sm text-gray-400 mt-2">Create your student account</p>
         </div>
 
-        <form onSubmit={handleRegister} className="space-y-4">
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 text-sm">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="text-xs font-mono text-gray-400 block mb-1.5">Full Name *</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+              Full Name
+            </label>
             <input
               type="text"
-              required
-              placeholder="e.g. Student Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-surface-100 rounded-xl border border-white/10 text-xs text-white focus:outline-none focus:border-purple-400"
+              placeholder="Enter your name"
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#ffc16b]/50 transition-colors"
             />
           </div>
 
           <div>
-            <label className="text-xs font-mono text-gray-400 block mb-1.5">University Roll Number *</label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. 23BCSE042"
-              value={rollNumber}
-              onChange={(e) => setRollNumber(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-surface-100 rounded-xl border border-white/10 text-xs text-white focus:outline-none focus:border-purple-400 font-mono"
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-mono text-gray-400 block mb-1.5">Department / School *</label>
-            <select
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-surface-100 rounded-xl border border-white/10 text-xs text-white focus:outline-none focus:border-purple-400"
-            >
-              <option value="School of Engineering & Computing">School of Engineering & Computing</option>
-              <option value="School of Management & Commerce">School of Management & Commerce</option>
-              <option value="School of Pharmacy">School of Pharmacy</option>
-              <option value="School of Allied Sciences">School of Allied Sciences</option>
-              <option value="School of Architecture & Design">School of Architecture & Design</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="text-xs font-mono text-gray-400 block mb-1.5">DBUU Email *</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+              Email Address
+            </label>
             <input
               type="email"
               required
-              placeholder="name@dbuu.ac.in"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-surface-100 rounded-xl border border-white/10 text-xs text-white focus:outline-none focus:border-purple-400"
+              placeholder="student@dbuu.ac.in"
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#ffc16b]/50 transition-colors"
             />
           </div>
 
           <div>
-            <label className="text-xs font-mono text-gray-400 block mb-1.5">Password *</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+              Password
+            </label>
             <input
               type="password"
               required
-              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-surface-100 rounded-xl border border-white/10 text-xs text-white focus:outline-none focus:border-purple-400"
+              placeholder="Create a strong password"
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#ffc16b]/50 transition-colors"
             />
           </div>
 
           <button
             type="submit"
-            disabled={submitting}
-            className="w-full btn-cyber-purple py-2.5 text-xs font-bold flex items-center justify-center gap-2"
+            disabled={loading}
+            className="w-full btn-cyber-primary py-3 text-sm font-bold uppercase tracking-wider disabled:opacity-50"
           >
-            {submitting ? 'Creating Identity...' : success ? 'Account Created ✓' : 'Create Student Account'}
+            {loading ? 'Creating Account...' : 'Register'}
           </button>
         </form>
 
-        <div className="pt-2 border-t border-white/10 text-center text-xs text-gray-400">
-          Already registered?{' '}
-          <Link
-            href="/auth/login"
-            onClick={() => sounds.playClick()}
-            className="text-purple-400 hover:text-purple-300 font-bold"
-          >
+        <p className="mt-6 text-center text-sm text-gray-400">
+          Already have an account?{' '}
+          <Link href="/auth/login" className="text-[#ffc16b] hover:underline">
             Login here
           </Link>
-        </div>
+        </p>
       </div>
     </div>
   );

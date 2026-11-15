@@ -134,7 +134,7 @@ export default function HomePage() {
       <section className="scene" aria-label="DBUU University Hub">
         {/* Sticky Visual Background Scene using uploaded high-res image */}
         <div className="scene__visual" aria-hidden="true">
-          <img src="/assets/bg-castle.jpg" alt="DBUU Celestial Realm" />
+          <img src="/assets/background.jpg" alt="DBUU Celestial Realm" />
           <div className="scene__veil" />
           <div className="scene__glow" />
         </div>
@@ -149,10 +149,10 @@ export default function HomePage() {
               Dev Bhoomi Uttarakhand University
             </p>
             
-            {/* Connection Hub heading where Hub is strictly in black text */}
+            {/* Connection Hub heading where Hub is in black text with no yellow background */}
             <h1 className="tracking-tight">
               Connection
-              <span className="inline-block ml-3 px-4 py-0.5 rounded-2xl bg-[#ffc16b] text-black font-extrabold not-italic shadow-[0_4px_25px_rgba(255,193,107,0.7)] text-[0.82em] align-middle">
+              <span className="text-black italic ml-3">
                 Hub
               </span>
             </h1>

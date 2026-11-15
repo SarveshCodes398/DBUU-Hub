@@ -1,168 +1,105 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  UserCheck, 
-  Lock, 
-  Mail, 
-  ArrowRight, 
-  ShieldCheck, 
-  Sparkles, 
-  Zap, 
-  KeyRound,
-  CheckCircle2
-} from 'lucide-react';
-import { sounds, triggerConfetti } from '@/lib/utils';
+import Link from 'next/link';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    sounds.playMove();
+    setError('');
+    setLoading(true);
 
-    setTimeout(() => {
-      setSubmitting(false);
-      setSuccess(true);
-      sounds.playSuccess();
-      triggerConfetti();
-      setTimeout(() => {
-        router.push('/profile');
-      }, 700);
-    }, 600);
-  };
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-  const handleQuickDemoLogin = () => {
-    setEmail('student@dbuu.ac.in');
-    setPassword('DBUU-Student-2026');
-    setSubmitting(true);
-    sounds.playMove();
+      const data = await res.json();
 
-    setTimeout(() => {
-      setSubmitting(false);
-      setSuccess(true);
-      sounds.playSuccess();
-      triggerConfetti();
-      setTimeout(() => {
-        router.push('/profile');
-      }, 700);
-    }, 500);
+      if (!res.ok) {
+        setError(data.error || 'Login failed');
+        setLoading(false);
+        return;
+      }
+
+      // Success - redirect to home
+      router.push('/');
+      router.refresh();
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-16">
-      
-      {/* Container */}
-      <div className="glass-panel-glow rounded-3xl p-8 border border-cyan-500/30 relative overflow-hidden space-y-6">
-        <div className="absolute top-0 right-0 w-60 h-60 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-400 via-blue-600 to-purple-600 p-[1.5px] mx-auto shadow-neon-cyan">
-            <div className="w-full h-full bg-[#070A14] rounded-2xl flex items-center justify-center text-cyan-400">
-              <UserCheck className="w-6 h-6" />
-            </div>
-          </div>
-
-          <h1 className="text-2xl font-black text-white">
-            DBUU STUDENT ENTRY
+    <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <div className="w-full max-w-md glass-panel rounded-2xl p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-light font-['Cormorant_Garamond'] text-[#fff8e9]">
+            Welcome Back to <span className="text-[#ffc16b]">DBUU Hub</span>
           </h1>
-          <p className="text-xs text-gray-400">
-            Dev Bhoomi Uttarakhand University Unified Hub Nexus
-          </p>
+          <p className="text-sm text-gray-400 mt-2">Login with your student account</p>
         </div>
 
-        {/* Quick 1-Click Demo Login Banner */}
-        <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-xs space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-cyan-300 font-bold flex items-center gap-1.5">
-              <Zap className="w-4 h-4 text-cyan-400" />
-              Quick Student Demo Login
-            </span>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300">
-              Instant
-            </span>
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 text-sm">
+            {error}
           </div>
-          <p className="text-[11px] text-gray-300">
-            Click below to instantly authenticate as a student without typing credentials.
-          </p>
-          <button
-            type="button"
-            onClick={handleQuickDemoLogin}
-            className="w-full py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-neon-cyan"
-          >
-            <span>One-Click Student Entry</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
+        )}
 
-        {/* Normal Login Form */}
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="text-xs font-mono text-gray-400 block mb-1.5">
-              University Email / Roll Number
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+              Email Address
             </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                required
-                placeholder="rollno@dbuu.ac.in or 23BCSE042"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 bg-surface-100 rounded-xl border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono"
-              />
-            </div>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="student@dbuu.ac.in"
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#ffc16b]/50 transition-colors"
+            />
           </div>
 
           <div>
-            <label className="text-xs font-mono text-gray-400 block mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
               Password
             </label>
-            <div className="relative">
-              <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="password"
-                required
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 bg-surface-100 rounded-xl border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
-              />
-            </div>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#ffc16b]/50 transition-colors"
+            />
           </div>
 
           <button
             type="submit"
-            disabled={submitting}
-            className="w-full btn-cyber-primary py-2.5 text-xs font-bold flex items-center justify-center gap-2"
+            disabled={loading}
+            className="w-full btn-cyber-primary py-3 text-sm font-bold uppercase tracking-wider disabled:opacity-50"
           >
-            {submitting ? 'Authenticating...' : success ? 'Entry Granted ✓' : 'Authenticate & Enter'}
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
-        <div className="pt-2 border-t border-white/10 text-center text-xs text-gray-400 space-y-2">
-          <div>
-            Don't have an account?{' '}
-            <Link
-              href="/auth/register"
-              onClick={() => sounds.playClick()}
-              className="text-cyan-400 hover:text-cyan-300 font-bold"
-            >
-              Register here
-            </Link>
-          </div>
-          <div className="flex items-center justify-center gap-1.5 text-[11px] text-gray-500 font-mono">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>MongoDB Encrypted Auth & JWT Token Session</span>
-          </div>
-        </div>
+        <p className="mt-6 text-center text-sm text-gray-400">
+          Don&apos;t have an account?{' '}
+          <Link href="/auth/register" className="text-[#ffc16b] hover:underline">
+            Register here
+          </Link>
+        </p>
       </div>
     </div>
   );
