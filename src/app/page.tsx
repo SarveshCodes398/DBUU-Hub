@@ -3,11 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { 
-  Gamepad2, 
-  Users, 
-  EyeOff, 
-  Calendar, 
-  Sparkles, 
   ArrowRight, 
   PlusCircle, 
   Crown, 
@@ -99,14 +94,16 @@ export default function HomePage() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("is-visible");
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+          }
         });
       },
-      { threshold: 0.22 }
+      { threshold: 0.18 }
     );
 
     document
-      .querySelectorAll<HTMLElement>("[data-reveal]")
+      .querySelectorAll<HTMLElement>("[data-reveal], [data-reveal-left], [data-reveal-right]")
       .forEach((element) => observer.observe(element));
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -135,9 +132,9 @@ export default function HomePage() {
       </div>
 
       <section className="scene" aria-label="DBUU University Hub">
-        {/* Sticky Visual Background Scene */}
+        {/* Sticky Visual Background Scene using uploaded high-res image */}
         <div className="scene__visual" aria-hidden="true">
-          <img src="/assets/d3d3a.png" alt="DBUU Realm" />
+          <img src="/assets/bg-castle.jpg" alt="DBUU Celestial Realm" />
           <div className="scene__veil" />
           <div className="scene__glow" />
         </div>
@@ -151,13 +148,20 @@ export default function HomePage() {
             <p className="hero__eyebrow">
               Dev Bhoomi Uttarakhand University
             </p>
-            <h1>
-              The University
-              <span>Hub</span>
+            
+            {/* Connection Hub heading where Hub is strictly in black text */}
+            <h1 className="tracking-tight">
+              Connection
+              <span className="inline-block ml-3 px-4 py-0.5 rounded-2xl bg-[#ffc16b] text-black font-extrabold not-italic shadow-[0_4px_25px_rgba(255,193,107,0.7)] text-[0.82em] align-middle">
+                Hub
+              </span>
             </h1>
+
+            {/* Subtitle updated per instruction */}
             <p className="hero__copy">
-              A unified campus nexus: multiplayer & computer mind games, DBUU Dance Ikon 2026 volunteering recruitment, and anonymous student confessions.
+              Connect and Explore Hub
             </p>
+
             <button className="explore-button group" type="button" onClick={goToStory}>
               <span>Enter the Hub</span>
               <span className="transition-transform duration-300 group-hover:translate-y-1">
@@ -172,67 +176,74 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Chapters Story Section */}
+        {/* Chapters Story Section with alternating smooth card entrances */}
         <div id="story" className="relative z-10">
-          {chapters.map((chapter, index) => (
-            <section
-              className={`chapter chapter--${chapter.align}`}
-              id={index === 1 ? "dance-ikon" : index === 2 ? "confessions" : undefined}
-              key={chapter.number}
-            >
-              <article className="chapter__card" data-reveal>
-                <div className="chapter__meta">
-                  <span>{chapter.number}</span>
-                  <i />
-                  <span>{chapter.eyebrow}</span>
-                </div>
-                <h2>{chapter.title}</h2>
-                <p>{chapter.copy}</p>
-
-                {/* Sublinks for Games chapter */}
-                {'sublinks' in chapter && chapter.sublinks && (
-                  <div className="mt-5 grid grid-cols-2 gap-2 text-xs font-mono">
-                    {chapter.sublinks.map((sub, i) => {
-                      const SubIcon = sub.icon;
-                      return (
-                        <Link
-                          key={i}
-                          href={sub.href}
-                          onClick={() => sounds.playClick()}
-                          className="flex items-center gap-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[#ffc16b] hover:text-white transition-all"
-                        >
-                          <SubIcon className="w-3.5 h-3.5" />
-                          <span>{sub.name}</span>
-                        </Link>
-                      );
-                    })}
+          {chapters.map((chapter, index) => {
+            // First card pops in from left, second from right, third from left, fourth from right
+            const isLeftEntrance = index % 2 === 0;
+            return (
+              <section
+                className={`chapter chapter--${chapter.align}`}
+                id={index === 1 ? "dance-ikon" : index === 2 ? "confessions" : undefined}
+                key={chapter.number}
+              >
+                <article 
+                  className="chapter__card" 
+                  {...(isLeftEntrance ? { 'data-reveal-left': '' } : { 'data-reveal-right': '' })}
+                >
+                  <div className="chapter__meta">
+                    <span>{chapter.number}</span>
+                    <i />
+                    <span>{chapter.eyebrow}</span>
                   </div>
-                )}
+                  <h2>{chapter.title}</h2>
+                  <p>{chapter.copy}</p>
 
-                {/* Chapter CTAs */}
-                <div className="mt-7 flex flex-wrap items-center gap-3">
-                  <Link
-                    href={chapter.ctaLink}
-                    onClick={() => sounds.playClick()}
-                    className="btn-cyber-primary px-6 py-2.5 text-xs font-bold flex items-center gap-2"
-                  >
-                    <span>{chapter.ctaText}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-
-                  {'secondaryLink' in chapter && chapter.secondaryLink && (
-                    <Link
-                      href={chapter.secondaryLink}
-                      onClick={() => sounds.playClick()}
-                      className="px-4 py-2.5 rounded-full border border-white/20 hover:border-[#ffc16b] text-xs font-bold text-gray-300 hover:text-white transition-all"
-                    >
-                      {chapter.secondaryText}
-                    </Link>
+                  {/* Sublinks for Games chapter */}
+                  {'sublinks' in chapter && chapter.sublinks && (
+                    <div className="mt-5 grid grid-cols-2 gap-2 text-xs font-mono">
+                      {chapter.sublinks.map((sub, i) => {
+                        const SubIcon = sub.icon;
+                        return (
+                          <Link
+                            key={i}
+                            href={sub.href}
+                            onClick={() => sounds.playClick()}
+                            className="flex items-center gap-2 p-2 rounded-lg bg-black/40 hover:bg-black/60 border border-white/10 text-[#ffc16b] hover:text-white transition-all backdrop-blur-sm"
+                          >
+                            <SubIcon className="w-3.5 h-3.5" />
+                            <span>{sub.name}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
                   )}
-                </div>
-              </article>
-            </section>
-          ))}
+
+                  {/* Chapter CTAs */}
+                  <div className="mt-7 flex flex-wrap items-center gap-3">
+                    <Link
+                      href={chapter.ctaLink}
+                      onClick={() => sounds.playClick()}
+                      className="btn-cyber-primary px-6 py-2.5 text-xs font-bold flex items-center gap-2"
+                    >
+                      <span>{chapter.ctaText}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+
+                    {'secondaryLink' in chapter && chapter.secondaryLink && (
+                      <Link
+                        href={chapter.secondaryLink}
+                        onClick={() => sounds.playClick()}
+                        className="px-4 py-2.5 rounded-full border border-white/20 hover:border-[#ffc16b] text-xs font-bold text-gray-300 hover:text-white transition-all bg-black/25 backdrop-blur-sm"
+                      >
+                        {chapter.secondaryText}
+                      </Link>
+                    )}
+                  </div>
+                </article>
+              </section>
+            );
+          })}
         </div>
       </section>
 
@@ -246,7 +257,7 @@ export default function HomePage() {
           <h2 className="text-4xl leading-[1] font-light md:text-6xl lg:text-7xl">
             Created for Every Student.
           </h2>
-          <p className="mt-4 text-xs sm:text-sm text-gray-400 max-w-md mx-auto">
+          <p className="mt-4 text-xs sm:text-sm text-gray-300 max-w-md mx-auto">
             Play mind sports, recruit your event dream team, publish college events, and share confessions with complete peace of mind.
           </p>
 
@@ -262,7 +273,7 @@ export default function HomePage() {
             <Link
               href="/games"
               onClick={() => sounds.playClick()}
-              className="px-6 py-3 rounded-full border border-white/20 hover:border-[#ffc16b] text-xs font-bold text-gray-200"
+              className="px-6 py-3 rounded-full border border-white/20 hover:border-[#ffc16b] text-xs font-bold text-gray-200 bg-black/30 backdrop-blur-sm"
             >
               Enter Games Arcade
             </Link>
