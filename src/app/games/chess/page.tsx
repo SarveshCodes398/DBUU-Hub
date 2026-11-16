@@ -279,9 +279,7 @@ export default function ChessPage() {
           </Link>
           <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
             <span className="text-cyan-400">GRANDMASTER</span> CHESS
-            <span className="text-xs px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono">
-              FIDE RULES
-            </span>
+
           </h1>
           <p className="text-sm text-gray-400 mt-1">
             Battle against DBUU’s algorithmic chess engine or duel locally with a fellow student.
