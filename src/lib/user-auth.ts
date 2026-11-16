@@ -6,6 +6,7 @@ export interface StoredUser {
   id?: string;
   name: string;
   email: string;
+  erpId: string;
   password: string; // encoded
   createdAt: string;
 }
@@ -15,6 +16,8 @@ const LOCAL_DATA_PATH = path.join(process.cwd(), "data", "users.json");
 function getLocalUsers(): StoredUser[] {
   try {
     if (!fs.existsSync(LOCAL_DATA_PATH)) {
+      const dir = path.dirname(LOCAL_DATA_PATH);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(LOCAL_DATA_PATH, JSON.stringify([]), "utf-8");
       return [];
     }
@@ -38,20 +41,24 @@ function saveLocalUsers(users: StoredUser[]) {
   }
 }
 
-export async function findUser(email: string): Promise<StoredUser | null> {
-  const normalizedEmail = email.trim().toLowerCase();
+export async function findUser(identifier: string): Promise<StoredUser | null> {
+  const normalized = identifier.trim().toLowerCase();
 
   // Try MongoDB Atlas first
   try {
     const { db } = await connectToDatabase();
     const user = await db.collection("users").findOne({
-      email: { $regex: new RegExp(`^${normalizedEmail}$`, "i") }
+      $or: [
+        { email: { $regex: new RegExp(`^${normalized}$`, "i") } },
+        { erpId: { $regex: new RegExp(`^${normalized}$`, "i") } }
+      ]
     });
     if (user) {
       return {
         id: user._id?.toString(),
         name: user.name || "Student",
         email: user.email,
+        erpId: user.erpId || "DBUU-STUDENT",
         password: user.password,
         createdAt: user.createdAt?.toString() || new Date().toISOString()
       };
@@ -62,21 +69,29 @@ export async function findUser(email: string): Promise<StoredUser | null> {
 
   // Fallback to local store
   const localUsers = getLocalUsers();
-  const matched = localUsers.find(u => u.email.toLowerCase() === normalizedEmail);
+  const matched = localUsers.find(
+    u => u.email.toLowerCase() === normalized || (u.erpId && u.erpId.toLowerCase() === normalized)
+  );
   return matched || null;
 }
 
-export async function registerUser(name: string, email: string, encodedPassword: string): Promise<StoredUser> {
+export async function registerUser(
+  name: string,
+  email: string,
+  erpId: string,
+  encodedPassword: string
+): Promise<StoredUser> {
   const normalizedEmail = email.trim().toLowerCase();
+  const normalizedErp = erpId.trim().toUpperCase();
+
   const newUser: StoredUser = {
     id: `usr-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-    name: name.trim() || "Student",
+    name: name.trim() || "DBUU Student",
     email: normalizedEmail,
+    erpId: normalizedErp,
     password: encodedPassword,
     createdAt: new Date().toISOString()
   };
-
-  let savedToAtlas = false;
 
   // Attempt save to MongoDB Atlas
   try {
@@ -84,18 +99,20 @@ export async function registerUser(name: string, email: string, encodedPassword:
     await db.collection("users").insertOne({
       name: newUser.name,
       email: newUser.email,
+      erpId: newUser.erpId,
       password: newUser.password,
       createdAt: new Date()
     });
-    savedToAtlas = true;
-    console.log("[Auth] Successfully saved user to MongoDB Atlas:", newUser.email);
+    console.log("[Auth] Successfully saved user to MongoDB Atlas:", newUser.email, newUser.erpId);
   } catch (mongoErr: any) {
     console.warn("[Auth Notice] Could not save to MongoDB Atlas (Check Atlas IP Whitelist):", mongoErr?.message);
   }
 
   // Always save to local store as well for immediate reliability
   const localUsers = getLocalUsers();
-  const filtered = localUsers.filter(u => u.email.toLowerCase() !== normalizedEmail);
+  const filtered = localUsers.filter(
+    u => u.email.toLowerCase() !== normalizedEmail && u.erpId?.toUpperCase() !== normalizedErp
+  );
   filtered.push(newUser);
   saveLocalUsers(filtered);
 

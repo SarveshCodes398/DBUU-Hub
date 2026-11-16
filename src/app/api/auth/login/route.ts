@@ -3,16 +3,18 @@ import { findUser } from "@/lib/user-auth";
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    const body = await req.json();
+    const identifier = body.email || body.erpId || body.identifier;
+    const password = body.password;
 
-    if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
+    if (!identifier || !password) {
+      return NextResponse.json({ error: "Email or Student ERP ID and password are required" }, { status: 400 });
     }
 
-    const user = await findUser(email);
+    const user = await findUser(identifier);
     if (!user) {
       return NextResponse.json({ 
-        error: "No account found with this email. Please register first." 
+        error: "No student account found with this Email / ERP ID. Please register first." 
       }, { status: 401 });
     }
 
@@ -26,12 +28,18 @@ export async function POST(req: Request) {
     const token = Buffer.from(JSON.stringify({ 
       email: user.email, 
       name: user.name, 
+      erpId: user.erpId || "DBUU-STUDENT",
       ts: Date.now() 
     })).toString("base64");
 
     const response = NextResponse.json({ 
       success: true, 
-      message: "Login successful" 
+      message: "Login successful",
+      user: {
+        name: user.name,
+        email: user.email,
+        erpId: user.erpId || "DBUU-STUDENT"
+      }
     });
 
     response.cookies.set("auth_token", token, {

@@ -17,7 +17,8 @@ import {
   Home,
   UserCheck,
   LogIn,
-  LogOut
+  LogOut,
+  User
 } from 'lucide-react';
 import { sounds } from '@/lib/utils';
 
@@ -25,6 +26,31 @@ export default function Navbar() {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [soundActive, setSoundActive] = useState(true);
+  const [currentUser, setCurrentUser] = useState<{ name: string; erpId?: string } | null>(null);
+
+  useEffect(() => {
+    // Check logged in user
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('dbuu_auth_user');
+      if (saved) {
+        try {
+          setCurrentUser(JSON.parse(saved));
+        } catch (e) {}
+      }
+    }
+
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data.loggedIn && data.user) {
+          setCurrentUser(data.user);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('dbuu_auth_user', JSON.stringify(data.user));
+          }
+        }
+      })
+      .catch(() => {});
+  }, [pathname]);
 
   // Close sidebar on Escape key
   useEffect(() => {
@@ -59,7 +85,11 @@ export default function Navbar() {
   };
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('dbuu_auth_user');
+    }
+    setCurrentUser(null);
     window.location.href = '/';
   };
 
@@ -93,12 +123,25 @@ export default function Navbar() {
 
             {/* Login / Profile */}
             <Link
-              href="/auth/login"
+              href={currentUser ? "/profile" : "/auth/login"}
               onClick={() => sounds.playClick()}
-              className="p-2 sm:p-2.5 rounded-full border border-white/20 bg-black/40 hover:border-[#ffc16b]/60 text-white/80 hover:text-white transition-all backdrop-blur-sm"
-              title="Login / Register"
+              className={`p-2 sm:p-2.5 rounded-full border transition-all backdrop-blur-sm flex items-center gap-1.5 ${
+                currentUser 
+                  ? 'border-[#ffc16b]/50 bg-[#ffc16b]/15 text-[#ffc16b]' 
+                  : 'border-white/20 bg-black/40 hover:border-[#ffc16b]/60 text-white/80 hover:text-white'
+              }`}
+              title={currentUser ? `Profile: ${currentUser.name}` : "Login / Register"}
             >
-              <LogIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              {currentUser ? (
+                <>
+                  <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ffc16b]" />
+                  <span className="hidden lg:inline text-xs font-mono font-bold text-white max-w-[100px] truncate">
+                    {currentUser.name}
+                  </span>
+                </>
+              ) : (
+                <LogIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              )}
             </Link>
 
             {/* Audio Toggle */}
@@ -156,8 +199,28 @@ export default function Navbar() {
                 </button>
               </div>
 
+              {/* Logged in student info chip */}
+              {currentUser && (
+                <div className="mt-4 p-3 rounded-xl bg-[#ffc16b]/10 border border-[#ffc16b]/30 flex items-center justify-between">
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-mono text-[#ffc16b] uppercase block">Authenticated Student</span>
+                    <p className="text-xs font-bold text-white truncate">{currentUser.name}</p>
+                    {currentUser.erpId && (
+                      <p className="text-[10px] font-mono text-gray-400">ERP: {currentUser.erpId}</p>
+                    )}
+                  </div>
+                  <Link
+                    href="/profile"
+                    onClick={handleLinkClick}
+                    className="px-2.5 py-1 rounded bg-[#ffc16b] text-black text-[10px] font-mono font-bold shrink-0"
+                  >
+                    VIEW
+                  </Link>
+                </div>
+              )}
+
               {/* Navigation Items */}
-              <div className="py-5 space-y-2">
+              <div className="py-4 space-y-2">
                 {navLinks.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href;
@@ -198,14 +261,25 @@ export default function Navbar() {
             </div>
 
             {/* Drawer Footer */}
-            <div className="pt-5 border-t border-white/10 text-xs text-gray-500 space-y-3">
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
+            <div className="pt-4 border-t border-white/10 text-xs text-gray-500 space-y-3">
+              {currentUser ? (
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout Account ({currentUser.name})</span>
+                </button>
+              ) : (
+                <Link
+                  href="/auth/login"
+                  onClick={handleLinkClick}
+                  className="flex items-center gap-2 text-[#ffc16b] hover:underline"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Student Login with ERP ID</span>
+                </Link>
+              )}
               <p className="text-[11px] text-gray-500">Dev Bhoomi Uttarakhand University</p>
               <div className="text-[10px] sm:text-[11px] text-emerald-400 flex items-center gap-1.5 font-mono">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>

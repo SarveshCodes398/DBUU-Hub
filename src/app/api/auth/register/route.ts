@@ -3,35 +3,50 @@ import { findUser, registerUser } from "@/lib/user-auth";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, erpId, password } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
+    }
+
+    if (!erpId || !erpId.trim()) {
+      return NextResponse.json({ error: "Student ERP ID is required" }, { status: 400 });
     }
 
     if (password.length < 4) {
       return NextResponse.json({ error: "Password must be at least 4 characters long" }, { status: 400 });
     }
 
-    // Check if user already exists
+    // Check if user already exists with email or ERP ID
     const existingUser = await findUser(email);
     if (existingUser) {
       return NextResponse.json({ error: "Account already exists with this email. Please Login." }, { status: 400 });
     }
 
+    const existingErp = await findUser(erpId);
+    if (existingErp) {
+      return NextResponse.json({ error: "An account is already registered with this ERP ID. Please Login." }, { status: 400 });
+    }
+
     const encodedPassword = Buffer.from(password).toString("base64");
-    const user = await registerUser(name, email, encodedPassword);
+    const user = await registerUser(name, email, erpId, encodedPassword);
 
     // Set auth cookie
     const token = Buffer.from(JSON.stringify({ 
       email: user.email, 
-      name: user.name, 
+      name: user.name,
+      erpId: user.erpId,
       ts: Date.now() 
     })).toString("base64");
 
     const response = NextResponse.json({ 
       success: true, 
-      message: "Registration successful" 
+      message: "Registration successful",
+      user: {
+        name: user.name,
+        email: user.email,
+        erpId: user.erpId
+      }
     });
 
     response.cookies.set("auth_token", token, {
