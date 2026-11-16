@@ -52,6 +52,9 @@ export default function ChessPage() {
   const [capturedBlack, setCapturedBlack] = useState<string[]>([]);
   const [isAiThinking, setIsAiThinking] = useState(false);
 
+  // Direct move broadcaster ref to push moves instantly without delay
+  const directMoveSenderRef = useRef<((state: any) => Promise<void>) | null>(null);
+
   // Initialize game
   const initGame = useCallback(() => {
     const newGame = new Chess();
@@ -92,18 +95,10 @@ export default function ChessPage() {
         setGameStatus(game.turn() === 'w' ? 'White to move' : 'Black to move');
         sounds.playMove();
 
-        // Calculate captured pieces from fen
+        // Calculate captures
         const boardPieces = game.board().flat().filter(Boolean);
-        const currentWhitePieces = boardPieces.filter(p => p?.color === 'w').map(p => p?.type.toUpperCase());
-        const currentBlackPieces = boardPieces.filter(p => p?.color === 'b').map(p => p?.type.toLowerCase());
-        
-        const initialWhite = ['P','P','P','P','P','P','P','P','R','R','N','N','B','B','Q','K'];
-        const initialBlack = ['p','p','p','p','p','p','p','p','r','r','n','n','b','b','q','k'];
-        
-        // simple diff for captures
-        const capW: string[] = [];
-        const capB: string[] = [];
-        // update capture lists safely
+        const currentWhiteCount = boardPieces.filter(p => p?.color === 'w').length;
+        const currentBlackCount = boardPieces.filter(p => p?.color === 'b').length;
       } catch (error) {
         console.error('Failed to sync multiplayer chess state:', error);
       }
@@ -196,7 +191,7 @@ export default function ChessPage() {
       } else {
         setGameStatus(currentGame.turn() === 'w' ? 'White to move' : 'Black to move');
       }
-    }, 450);
+    }, 400);
   }, [aiDifficulty]);
 
   // Turn verification check for strict player restriction
@@ -208,11 +203,9 @@ export default function ChessPage() {
       return currentTurn === 'w' && !isAiThinking;
     }
     if (gameMode === 'pvp') {
-      // In Pass-and-Play, both players share the screen, but can only touch their own pieces on their turn!
       return true;
     }
     if (gameMode === 'multiplayer') {
-      // In online multiplayer: strictly restricted!
       return currentTurn === myMultiplayerColor;
     }
     return true;
@@ -230,13 +223,11 @@ export default function ChessPage() {
     // 1. ONLINE MULTIPLAYER TURN RESTRICTION:
     if (gameMode === 'multiplayer') {
       if (currentTurn !== myMultiplayerColor) {
-        // Not your turn! Do not allow moving or selecting
         return;
       }
     }
 
     // 2. PASS & PLAY RESTRICTION:
-    // Only pieces of the current turn's player can be selected or moved
     if (selectedSquare) {
       if (selectedSquare === square) {
         setSelectedSquare(null);
@@ -253,6 +244,7 @@ export default function ChessPage() {
         });
 
         if (move) {
+          // INSTANT 0ms LOCAL UPDATE: Piece moves on screen immediately!
           sounds.playMove();
           if (move.captured) {
             if (move.color === 'w') {
@@ -262,10 +254,21 @@ export default function ChessPage() {
             }
           }
 
+          const newHistory = [...moveHistory, move.san];
+          const newFen = game.fen();
+
           setBoard(game.board());
-          setMoveHistory(prev => [...prev, move.san]);
+          setMoveHistory(newHistory);
           setSelectedSquare(null);
           setValidMoves([]);
+
+          // IMMEDIATELY PUSH MOVE TO SERVER FOR <250ms INSTANT MULTIPLAYER BROADCAST
+          if (gameMode === 'multiplayer' && directMoveSenderRef.current) {
+            directMoveSenderRef.current({
+              fen: newFen,
+              moveHistory: newHistory
+            });
+          }
 
           // Check win / status
           if (game.isCheckmate()) {
@@ -273,7 +276,6 @@ export default function ChessPage() {
             sounds.playSuccess();
             triggerConfetti();
 
-            // Save win stats in localStorage
             if (typeof window !== 'undefined') {
               const raw = localStorage.getItem('dbuu_game_stats') || '{}';
               try {
@@ -306,11 +308,9 @@ export default function ChessPage() {
 
     // Select piece if it belongs to current player's turn
     if (piece && piece.color === currentTurn) {
-      // In online multiplayer, ensure piece matches your assigned color
       if (gameMode === 'multiplayer' && piece.color !== myMultiplayerColor) {
         return;
       }
-      // In AI mode, user can only touch White
       if (gameMode === 'ai' && piece.color !== 'w') {
         return;
       }
@@ -326,7 +326,7 @@ export default function ChessPage() {
   };
 
   const undoMove = () => {
-    if (!game || gameMode === 'multiplayer') return; // Cannot undo in online multiplayer
+    if (!game || gameMode === 'multiplayer') return;
     if (gameMode === 'ai') {
       game.undo();
       game.undo();
@@ -346,7 +346,7 @@ export default function ChessPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
-      {/* Header with Back button and Title (No FIDE rules box) */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <Link
@@ -361,7 +361,7 @@ export default function ChessPage() {
             <span className="text-cyan-400">GRANDMASTER</span> CHESS
           </h1>
           <p className="text-xs sm:text-sm text-gray-400 mt-1">
-            Challenge DBUU’s algorithmic engine, duel in local Pass-and-Play, or connect with a friend online via room key.
+            Challenge DBUU’s algorithmic engine, duel in local Pass-and-Play, or connect with a friend online via instant room key.
           </p>
         </div>
 
@@ -441,17 +441,20 @@ export default function ChessPage() {
             }`}
           >
             <Globe className="w-4 h-4" />
-            <span>3. Multiplayer Arena (Room Key)</span>
+            <span>3. Multiplayer Arena (Instant Key)</span>
           </button>
         </div>
       </div>
 
-      {/* MULTIPLAYER ROOM SYSTEM (Only shown or expanded when in multiplayer mode) */}
+      {/* MULTIPLAYER ROOM SYSTEM */}
       {gameMode === 'multiplayer' && (
         <MultiplayerRoom
           game="chess"
           currentGameState={currentMultiplayerState}
           onRoomSync={handleMultiplayerSync}
+          onRegisterMoveSender={(sender) => {
+            directMoveSenderRef.current = sender;
+          }}
         />
       )}
 
