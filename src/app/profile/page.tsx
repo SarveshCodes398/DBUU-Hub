@@ -1,22 +1,37 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react';
 import Link from 'next/link';
 import {
-  UserCheck,
-  Trophy,
   Award,
   Gamepad2,
-  ShieldCheck,
   Sparkles,
   CheckCircle2,
   ChevronRight,
-  PlusCircle,
+  type LucideIcon,
 } from 'lucide-react';
 import { sounds } from '@/lib/utils';
 
+type ProfileData = {
+  name: string;
+  erpId: string | null;
+  xp: number;
+  level: number;
+  rank: string;
+  badges: { icon: string; name: string; desc: string }[];
+  applications: { eventName: string; role: string; date: string; status: string }[];
+  gameStats: {
+    chessWins: number;
+    chessGames: number;
+    ludoWins: number;
+    ludoGames: number;
+    sudokuSolves: number;
+    mathHighScore: number;
+  };
+};
+
 // Helper component for section headers
-function SectionHeader({ icon: Icon, title }) {
+function SectionHeader({ icon: Icon, title }: { icon: LucideIcon; title: string }) {
   return (
     <h3 className="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
       <Icon className="w-4 h-4" /> {title}
@@ -30,14 +45,14 @@ export default function ProfilePage() {
   const [submitted, setSubmitted] = useState(false);
 
   // Student profile state – populated after form submission
-  const [student, setStudent] = useState(null);
+  const [student, setStudent] = useState<ProfileData | null>(null);
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!form.name.trim()) return; // name required
     const newStudent = {
@@ -66,13 +81,13 @@ export default function ProfilePage() {
     if (student) {
       const lvl = Math.floor(student.xp / 500);
       if (lvl !== student.level) {
-        setStudent((prev) => ({ ...prev, level: lvl }));
+        setStudent((prev) => (prev ? { ...prev, level: lvl } : prev));
       }
     }
   }, [student?.xp]);
 
   // ---- Render ----
-  if (!submitted) {
+  if (!submitted || !student) {
     return (
       <div className="max-w-xl mx-auto p-6">
         <h2 className="text-2xl font-bold text-white mb-4">Create Your Profile</h2>
