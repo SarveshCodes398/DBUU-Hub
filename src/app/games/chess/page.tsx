@@ -16,6 +16,7 @@ import {
   Play
 } from 'lucide-react';
 import { sounds, triggerConfetti } from '@/lib/utils';
+import MultiplayerRoom from '@/components/MultiplayerRoom';
 
 // Standard chess piece symbols
 const PIECE_SYMBOLS: Record<string, string> = {
@@ -40,6 +41,25 @@ export default function ChessPage() {
   const [capturedWhite, setCapturedWhite] = useState<string[]>([]);
   const [capturedBlack, setCapturedBlack] = useState<string[]>([]);
   const [isAiThinking, setIsAiThinking] = useState(false);
+
+  // Sync with multiplayer room key
+  const handleMultiplayerSync = useCallback((incoming: any, isHost: boolean) => {
+    if (!incoming || !incoming.fen || !game) return;
+    if (incoming.fen !== game.fen()) {
+      try {
+        game.load(incoming.fen);
+        setBoard(game.board());
+        if (incoming.moveHistory) setMoveHistory(incoming.moveHistory);
+        setGameStatus(game.turn() === 'w' ? 'White to move' : 'Black to move');
+        sounds.playMove();
+      } catch (e) {}
+    }
+  }, [game]);
+
+  const currentMultiplayerState = game ? {
+    fen: game.fen(),
+    moveHistory,
+  } : null;
 
   // Initialize game
   const initGame = useCallback(() => {
@@ -286,6 +306,13 @@ export default function ChessPage() {
           </button>
         </div>
       </div>
+
+      {/* MULTIPLAYER ROOM SYSTEM */}
+      <MultiplayerRoom
+        game="chess"
+        currentGameState={currentMultiplayerState}
+        onRoomSync={handleMultiplayerSync}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Board */}

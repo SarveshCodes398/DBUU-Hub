@@ -17,6 +17,7 @@ import {
   X
 } from 'lucide-react';
 import { sounds, triggerConfetti } from '@/lib/utils';
+import MultiplayerRoom from '@/components/MultiplayerRoom';
 
 type Operation = '+' | '-' | '×' | '÷' | 'mixed';
 
@@ -44,6 +45,21 @@ export default function MathBlitzPage() {
   const [isGameOver, setIsGameOver] = useState(false);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [aiStatus, setAiStatus] = useState<string>('Ready to calculate...');
+
+  // Sync multiplayer duel scores
+  const handleMultiplayerSync = useCallback((incoming: any) => {
+    if (!incoming) return;
+    if (typeof incoming.playerScore === 'number') {
+      setAiScore(incoming.playerScore);
+      setAiStatus(`Opponent is at ${incoming.playerScore} pts!`);
+    }
+  }, []);
+
+  const currentMultiplayerState = {
+    playerScore,
+    streak,
+    timeLeft
+  };
 
   const aiTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -221,6 +237,13 @@ export default function MathBlitzPage() {
           {isPlaying ? 'Restart Blitz' : 'Start 45s Blitz'}
         </button>
       </div>
+
+      {/* MULTIPLAYER ROOM ARENA */}
+      <MultiplayerRoom
+        game="maths"
+        currentGameState={currentMultiplayerState}
+        onRoomSync={handleMultiplayerSync}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Main Math Arena */}

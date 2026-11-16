@@ -15,6 +15,7 @@ import {
   Zap
 } from 'lucide-react';
 import { sounds } from '@/lib/utils';
+import { Key } from 'lucide-react';
 
 export default function GamesHubPage() {
   const games = [
@@ -117,6 +118,43 @@ export default function GamesHubPage() {
               <span>Instant Gameplay (No Install Required)</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Multiplayer Arena Banner */}
+      <div className="w-full glass-panel rounded-2xl p-6 border border-[#ffc16b]/40 shadow-[0_0_30px_rgba(255,193,107,0.15)] mb-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <div className="p-3.5 rounded-2xl bg-[#ffc16b]/15 text-[#ffc16b] border border-[#ffc16b]/30 shrink-0">
+            <Key className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-bold text-white tracking-wide uppercase">Multiplayer Key Arena</h2>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono font-bold">
+                NEW FEATURE
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-gray-300 mt-1 max-w-xl">
+              Host a match to generate your unique room key, then share it with any university peer. They simply paste the key in &quot;Join With Key&quot; to duel instantly in Ludo, Chess, Sudoku, or Speed Math!
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0 w-full md:w-auto">
+          <Link
+            href="/games/ludo"
+            onClick={() => sounds.playClick()}
+            className="btn-cyber-primary px-5 py-2.5 text-xs font-bold w-full md:w-auto text-center"
+          >
+            Launch Ludo Room
+          </Link>
+          <Link
+            href="/games/chess"
+            onClick={() => sounds.playClick()}
+            className="px-5 py-2.5 rounded-full border border-white/20 text-xs font-bold text-white hover:border-[#ffc16b] glass-panel w-full md:w-auto text-center transition-all"
+          >
+            Launch Chess Room
+          </Link>
         </div>
       </div>
 

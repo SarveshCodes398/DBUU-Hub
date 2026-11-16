@@ -145,9 +145,14 @@ export default function HomePage() {
           className="hero relative z-10 flex min-h-[100svh] flex-col items-center justify-center px-4 sm:px-6 text-center"
         >
           <div className="hero__content w-full max-w-4xl mx-auto">
-            <p className="hero__eyebrow">
-              Dev Bhoomi Uttarakhand University
-            </p>
+            {/* Highly Visible Illuminated University Badge with Deep Backdrop */}
+            <div className="inline-flex items-center gap-2.5 px-4 sm:px-6 py-2 rounded-full bg-black/80 border border-[#ffc16b]/60 shadow-[0_0_25px_rgba(255,193,107,0.35)] backdrop-blur-md mb-6 sm:mb-8 group hover:border-[#ffc16b] transition-all">
+              <span className="w-2 h-2 rounded-full bg-[#ffc16b] shadow-[0_0_8px_#ffc16b] animate-ping" />
+              <span className="text-xs sm:text-sm font-bold tracking-[0.24em] uppercase text-[#fff8e9] font-mono">
+                Dev Bhoomi Uttarakhand University
+              </span>
+              
+            </div>
             
             {/* Connection Hub heading where Hub is in black text with no yellow background */}
             <h1 className="tracking-tight">

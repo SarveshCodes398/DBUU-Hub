@@ -15,6 +15,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { sounds, triggerConfetti } from '@/lib/utils';
+import MultiplayerRoom from '@/components/MultiplayerRoom';
 
 // Sample verified Sudoku boards with solutions
 const SUDOKU_DATA = {
@@ -105,6 +106,23 @@ export default function SudokuPage() {
   const [seconds, setSeconds] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [hintsRemaining, setHintsRemaining] = useState(3);
+
+  // Sync multiplayer
+  const handleMultiplayerSync = useCallback((incoming: any) => {
+    if (!incoming || !incoming.grid) return;
+    setGrid(incoming.grid);
+    if (incoming.mistakes) setMistakes(incoming.mistakes);
+    if (incoming.difficulty && incoming.difficulty !== difficulty) {
+      setDifficulty(incoming.difficulty);
+    }
+  }, [difficulty]);
+
+  const currentMultiplayerState = {
+    grid,
+    mistakes,
+    difficulty,
+    seconds
+  };
 
   // Initialize board
   const startNewGame = useCallback((diff: Difficulty) => {
@@ -272,6 +290,13 @@ export default function SudokuPage() {
           ))}
         </div>
       </div>
+
+      {/* MULTIPLAYER ROOM SYSTEM */}
+      <MultiplayerRoom
+        game="sudoku"
+        currentGameState={currentMultiplayerState}
+        onRoomSync={handleMultiplayerSync}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left: 9x9 Sudoku Grid */}

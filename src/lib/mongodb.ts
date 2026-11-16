@@ -1,13 +1,21 @@
 import { MongoClient, Db } from "mongodb";
 
 const uri = process.env.MONGODB_URI || "";
+console.log('MongoDB URI loaded:', !!uri);
 
 let cachedClient: MongoClient | null = null;
 let cachedDb: Db | null = null;
 
 export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db }> {
   if (cachedClient && cachedDb) {
-    return { client: cachedClient, db: cachedDb };
+    try {
+      await cachedClient.db().command({ ping: 1 });
+      return { client: cachedClient, db: cachedDb };
+    } catch {
+      // Reset cache if connection is dead
+      cachedClient = null;
+      cachedDb = null;
+    }
   }
 
   if (!uri) {
