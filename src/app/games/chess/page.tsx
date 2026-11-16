@@ -34,7 +34,21 @@ export default function ChessPage() {
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [validMoves, setValidMoves] = useState<string[]>([]);
   const [gameMode, setGameMode] = useState<'ai' | 'pvp'>('ai');
-  const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+
++
+@@
+-  const handleMultiplayerSync = useCallback((incoming: any, isHost: boolean) => {
+-    if (!incoming || !incoming.fen || !game) return;
+-    if (incoming.fen !== game.fen()) {
+-      try {
+-        game.load(incoming.fen);
+-        setBoard(game.board());
+-        if (incoming.moveHistory) setMoveHistory(incoming.moveHistory);
+-        setGameStatus(game.turn() === 'w' ? 'White to move' : 'Black to move');
+-        sounds.playMove();
+-      } catch (e) {}
+-    }
+-  }, [game]);  const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [playerColor, setPlayerColor] = useState<'w' | 'b'>('w');
   const [gameStatus, setGameStatus] = useState<string>('Game in progress');
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
@@ -43,18 +57,21 @@ export default function ChessPage() {
   const [isAiThinking, setIsAiThinking] = useState(false);
 
   // Sync with multiplayer room key
-  const handleMultiplayerSync = useCallback((incoming: any, isHost: boolean) => {
-    if (!incoming || !incoming.fen || !game) return;
-    if (incoming.fen !== game.fen()) {
-      try {
-        game.load(incoming.fen);
-        setBoard(game.board());
-        if (incoming.moveHistory) setMoveHistory(incoming.moveHistory);
-        setGameStatus(game.turn() === 'w' ? 'White to move' : 'Black to move');
-        sounds.playMove();
-      } catch (e) {}
-    }
-  }, [game]);
+  const [gameMode, setGameMode] = useState<'ai' | 'pvp'>('ai');
++  const [isMultiplayer, setIsMultiplayer] = useState(false);
+@@
+-  const handleMultiplayerSync = useCallback((incoming: any, isHost: boolean) => {
+-    if (!incoming || !incoming.fen || !game) return;
+-    if (incoming.fen !== game.fen()) {
+-      try {
+-        game.load(incoming.fen);
+-        setBoard(game.board());
+-        if (incoming.moveHistory) setMoveHistory(incoming.moveHistory);
+-        setGameStatus(game.turn() === 'w' ? 'White to move' : 'Black to move');
+-        sounds.playMove();
+-      } catch (e) {}
+-    }
+-  }, [game]);
 
   const currentMultiplayerState = game ? {
     fen: game.fen(),
