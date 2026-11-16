@@ -1,22 +1,23 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Chess, Square } from 'chess.js';
-import { 
-  Trophy, 
-  RotateCcw, 
-  Bot, 
-  Users, 
-  ChevronLeft, 
-  Award, 
-  Sparkles, 
-  Zap, 
-  HelpCircle,
-  Play
+import {
+  RotateCcw,
+  Bot,
+  Users,
+  ChevronLeft,
+  Sparkles,
+  Zap
 } from 'lucide-react';
 import { sounds, triggerConfetti } from '@/lib/utils';
 import MultiplayerRoom from '@/components/MultiplayerRoom';
+
+type MultiplayerChessState = {
+  fen?: string;
+  moveHistory?: string[];
+};
 
 // Standard chess piece symbols
 const PIECE_SYMBOLS: Record<string, string> = {
@@ -30,25 +31,13 @@ const PIECE_VALUES: Record<string, number> = {
 
 export default function ChessPage() {
   const [game, setGame] = useState<Chess | null>(null);
-  const [board, setBoard] = useState<(any)[][]>([]);
+  const [board, setBoard] = useState<ReturnType<Chess['board']>>([]);
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [validMoves, setValidMoves] = useState<string[]>([]);
   const [gameMode, setGameMode] = useState<'ai' | 'pvp'>('ai');
+  const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
 
-+
-@@
--  const handleMultiplayerSync = useCallback((incoming: any, isHost: boolean) => {
--    if (!incoming || !incoming.fen || !game) return;
--    if (incoming.fen !== game.fen()) {
--      try {
--        game.load(incoming.fen);
--        setBoard(game.board());
--        if (incoming.moveHistory) setMoveHistory(incoming.moveHistory);
--        setGameStatus(game.turn() === 'w' ? 'White to move' : 'Black to move');
--        sounds.playMove();
--      } catch (e) {}
--    }
--  }, [game]);  const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+
   const [playerColor, setPlayerColor] = useState<'w' | 'b'>('w');
   const [gameStatus, setGameStatus] = useState<string>('Game in progress');
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
@@ -57,21 +46,30 @@ export default function ChessPage() {
   const [isAiThinking, setIsAiThinking] = useState(false);
 
   // Sync with multiplayer room key
-  const [gameMode, setGameMode] = useState<'ai' | 'pvp'>('ai');
-+  const [isMultiplayer, setIsMultiplayer] = useState(false);
-@@
--  const handleMultiplayerSync = useCallback((incoming: any, isHost: boolean) => {
--    if (!incoming || !incoming.fen || !game) return;
--    if (incoming.fen !== game.fen()) {
--      try {
--        game.load(incoming.fen);
--        setBoard(game.board());
--        if (incoming.moveHistory) setMoveHistory(incoming.moveHistory);
--        setGameStatus(game.turn() === 'w' ? 'White to move' : 'Black to move');
--        sounds.playMove();
--      } catch (e) {}
--    }
--  }, [game]);
+  // Multiplayer flag
+  const [isMultiplayer, setIsMultiplayer] = useState(false);
+
+  // Sync handler for multiplayer rooms – forces Pass‑and‑Play on first sync
+  const handleMultiplayerSync = useCallback((incoming: MultiplayerChessState) => {
+    if (typeof incoming?.fen !== 'string' || !game) return;
+    if (incoming.fen !== game.fen()) {
+      try {
+        game.load(incoming.fen);
+        setBoard(game.board());
+        if (incoming.moveHistory) setMoveHistory(incoming.moveHistory);
+        setGameStatus(game.turn() === 'w' ? 'White to move' : 'Black to move');
+        sounds.playMove();
+      } catch (error) {
+        console.error('Failed to sync multiplayer chess state:', error);
+        setGameStatus('Unable to sync multiplayer game state');
+      }
+    }
+    if (!isMultiplayer) {
+      setIsMultiplayer(true);
+      setGameMode('pvp');
+    }
+  }, [game, isMultiplayer]);
+
 
   const currentMultiplayerState = game ? {
     fen: game.fen(),
@@ -244,7 +242,7 @@ export default function ChessPage() {
           }
           return;
         }
-      } catch (err) {
+      } catch {
         // Invalid move, ignore or re-select if clicking own piece
       }
     }
