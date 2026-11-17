@@ -31,16 +31,81 @@ export default function ConfessionsPage() {
   const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
   const [hasReacted, setHasReacted] = useState<Record<string, string[]>>({});
 
-  useEffect(() => {
-    fetch('/api/confessions')
+  // Inline Quick Post State
+  const [inlineOpen, setInlineOpen] = useState(false);
+  const [newContent, setNewContent] = useState('');
+  const [newCategory, setNewCategory] = useState<'crush' | 'campus-rant' | 'hostel' | 'exams' | 'confession' | 'appreciation'>('crush');
+  const [newAlias, setNewAlias] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [postSuccessMsg, setPostSuccessMsg] = useState('');
+
+  const fetchConfessions = () => {
+    fetch('/api/confessions', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data) {
-          setConfessions(data.data);
+          // Merge with any local submissions
+          let merged = [...data.data];
+          if (typeof window !== 'undefined') {
+            try {
+              const localList: Confession[] = JSON.parse(localStorage.getItem('dbuu_local_confessions') || '[]');
+              localList.forEach(localItem => {
+                if (!merged.some(m => m.id === localItem.id)) {
+                  merged.unshift(localItem);
+                }
+              });
+            } catch (e) {}
+          }
+          setConfessions(merged);
         }
       })
       .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchConfessions();
   }, []);
+
+  const handleInlineSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newContent.trim() || newContent.trim().length < 5) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/confessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: newContent.trim(),
+          category: newCategory,
+          authorAlias: newAlias.trim() || undefined
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        // Immediately add to top of feed
+        setConfessions(prev => [data.data, ...prev.filter(item => item.id !== data.data.id)]);
+        // Also save to localStorage
+        if (typeof window !== 'undefined') {
+          try {
+            const localList = JSON.parse(localStorage.getItem('dbuu_local_confessions') || '[]');
+            localList.unshift(data.data);
+            localStorage.setItem('dbuu_local_confessions', JSON.stringify(localList.slice(0, 50)));
+          } catch (e) {}
+        }
+        setNewContent('');
+        setNewAlias('');
+        setPostSuccessMsg('✨ Secret posted anonymously and added to the wall!');
+        sounds.playSuccess();
+        triggerConfetti();
+        setTimeout(() => setPostSuccessMsg(''), 4000);
+      }
+    } catch {
+      // fallback
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const categories = [
     { id: 'all', label: 'All Whispers' },
@@ -154,7 +219,7 @@ export default function ConfessionsPage() {
       </div>
 
       {/* Privacy Guarantee Pill */}
-      <div className="mb-8 p-3.5 rounded-xl bg-purple-950/30 border border-purple-500/20 text-xs text-purple-200 flex items-center justify-between">
+      <div className="mb-6 p-3.5 rounded-xl bg-purple-950/30 border border-purple-500/20 text-xs text-purple-200 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>
@@ -164,6 +229,82 @@ export default function ConfessionsPage() {
         <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-emerald-300 hidden sm:inline-block">
           ZERO TRACKING
         </span>
+      </div>
+
+      {/* Quick Anonymous Secret Composer — Appears directly on the wall */}
+      <div className="mb-8 p-5 sm:p-6 rounded-2xl glass-panel-purple border border-purple-500/40 shadow-[0_0_30px_rgba(168,85,247,0.12)]">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-base">🤫</span>
+            <span className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider font-mono">
+              Post an Anonymous Whisper to the Wall
+            </span>
+          </div>
+          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            Instant & Untracked
+          </span>
+        </div>
+
+        {postSuccessMsg && (
+          <div className="mb-3 p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-xs text-emerald-300 flex items-center gap-2 animate-bounce">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <span>{postSuccessMsg}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleInlineSubmit} className="space-y-3">
+          <textarea
+            rows={3}
+            placeholder="What's your unspoken secret, hostel gossip, cafeteria rant, or crush confession? (Min 5 chars)"
+            value={newContent}
+            onChange={(e) => setNewContent(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl bg-black/60 border border-white/15 text-white placeholder-gray-500 text-xs sm:text-sm focus:outline-none focus:border-purple-400 resize-none transition-colors"
+          />
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[11px] font-mono text-gray-400 mr-1">Category:</span>
+              {[
+                { id: 'crush', label: '💌 Crush' },
+                { id: 'campus-rant', label: '🔥 Campus' },
+                { id: 'hostel', label: '🌙 Hostel' },
+                { id: 'exams', label: '📚 Exams' },
+                { id: 'confession', label: '🤫 Secret' },
+              ].map(cat => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setNewCategory(cat.id as any)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-mono font-medium transition-all ${
+                    newCategory === cat.id
+                      ? 'bg-purple-600 text-white font-bold shadow-sm'
+                      : 'bg-black/40 text-gray-400 hover:text-white border border-white/10'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Alias (optional)"
+                value={newAlias}
+                onChange={(e) => setNewAlias(e.target.value)}
+                className="w-32 sm:w-36 px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-white placeholder-gray-500 text-xs font-mono focus:outline-none focus:border-purple-400"
+              />
+              <button
+                type="submit"
+                disabled={submitting || newContent.trim().length < 5}
+                className="btn-cyber-purple px-4 py-2 text-xs font-bold flex items-center justify-center gap-1.5 shrink-0 shadow-neon-purple disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transition-all"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>{submitting ? 'Posting...' : 'Post Whisper'}</span>
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
 
       {/* Filter and Search Bar */}

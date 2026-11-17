@@ -23,7 +23,12 @@ import {
   Bell,
   Menu,
   Sparkles,
-  Rocket
+  Rocket,
+  Crown,
+  Dice6,
+  Grid3X3,
+  Calculator,
+  ArrowRight
 } from 'lucide-react';
 import { sounds } from '@/lib/utils';
 
@@ -78,7 +83,34 @@ export default function Navbar() {
     if (next) sounds.playClick();
   };
 
-  // Nav links matching the design in user image
+  // Comprehensive search directory covering games, academics, events, community & opportunities
+  const searchableItems = [
+    { name: 'Grandmaster Chess', category: 'Games', desc: 'Online multiplayer & AI bot chess engine', href: '/games/chess', icon: Crown },
+    { name: 'Campus Ludo Royale', category: 'Games', desc: '2, 3 or 4 players online & local goti arena', href: '/games/ludo', icon: Dice6 },
+    { name: 'Quantum Sudoku', category: 'Games', desc: 'Interactive number placement grid with hints', href: '/games/sudoku', icon: Grid3X3 },
+    { name: 'Speed Math Blitz', category: 'Games', desc: 'Fast paced arithmetic sprint against timer', href: '/games/maths', icon: Calculator },
+    { name: 'Games Arcade Hub', category: 'Games', desc: 'Central campus multiplayer games lounge', href: '/games', icon: Gamepad2 },
+    { name: 'Engineering Notes & Syllabus', category: 'Academics', desc: 'B.Tech CSE, Mechanical & Civil modules', href: '/vault', icon: BookOpen },
+    { name: 'Previous Year Papers (PYQ)', category: 'Academics', desc: 'End-term exam papers, question banks & solutions', href: '/vault', icon: BookOpen },
+    { name: 'Pharmacy & Sciences Vault', category: 'Academics', desc: 'Lab manuals, pharmaceutical chemistry study notes', href: '/vault', icon: BookOpen },
+    { name: 'Pinaka Tech Fest 2026', category: 'Events', desc: '36-hour hackathon, robotics duel & codestorm', href: '/events', icon: Calendar },
+    { name: 'DBUU Cultural Conclave', category: 'Events', desc: 'Annual battle of bands, fashion showcase & fest', href: '/events', icon: Calendar },
+    { name: 'Publish College Event', category: 'Events', desc: 'Host your club tourney or conference', href: '/events/new', icon: PlusCircle },
+    { name: 'Anonymous Whispers Wall', category: 'Community', desc: 'Unfiltered campus thoughts & hostel confessions', href: '/confessions', icon: EyeOff },
+    { name: 'Post Anonymous Secret', category: 'Community', desc: 'Cryptographically untracked campus whisper', href: '/confessions/new', icon: EyeOff },
+    { name: 'DBUU Dance Ikon 2026 Crew', category: 'Volunteering', desc: 'Stage operations, VIP escort & media console recruitment', href: '/recruitment/apply/dance-ikon-2026-volunteers', icon: Rocket },
+    { name: 'All Volunteer Listings', category: 'Volunteering', desc: 'Campus conclaves, duties & leadership openings', href: '/recruitment', icon: Rocket },
+    { name: 'Student Profile & Stats', category: 'Passport', desc: 'XP points, campus level, badges & game records', href: '/profile', icon: UserCheck },
+  ];
+
+  const trimmedQuery = searchQuery.trim().toLowerCase();
+  const searchResults = trimmedQuery 
+    ? searchableItems.filter(item => 
+        item.name.toLowerCase().includes(trimmedQuery) ||
+        item.category.toLowerCase().includes(trimmedQuery) ||
+        item.desc.toLowerCase().includes(trimmedQuery)
+      )
+    : [];
   const primaryLinks = [
     { name: 'Home', href: '/', active: pathname === '/' },
     { name: 'Hub', href: '/games', active: pathname.startsWith('/games') },
@@ -116,7 +148,7 @@ export default function Navbar() {
   return (
     <>
       {/* Navbar — Styled exactly per the golden heraldic design */}
-      <header className="sticky top-0 z-40 w-full bg-[#0d0714]/90 backdrop-blur-md border-b border-[#f7cb73]/20 py-2.5 sm:py-3.5 transition-all shadow-[0_4px_25px_rgba(0,0,0,0.5)]">
+      <header className="sticky top-0 z-40 w-full bg-[#0d0714]/75 backdrop-blur-md border-b border-[#f7cb73]/20 py-2.5 sm:py-3.5 transition-all shadow-[0_4px_25px_rgba(0,0,0,0.5)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 flex items-center justify-between">
           
           {/* Logo with Winged Crest and Golden Serif Wordmark */}
@@ -280,47 +312,109 @@ export default function Navbar() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[#f7cb73]"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1 text-xs"
+                >
+                  Clear
+                </button>
+              )}
             </div>
 
-            <div className="space-y-1.5 pt-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-gray-400 block mb-2">
-                Quick Shortcuts:
-              </span>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <Link
-                  href="/games"
-                  onClick={() => setSearchOpen(false)}
-                  className="p-2.5 rounded-xl bg-white/5 hover:bg-[#f7cb73]/15 border border-white/5 hover:border-[#f7cb73]/40 text-gray-200 transition-all flex items-center gap-2"
-                >
-                  <Gamepad2 className="w-4 h-4 text-amber-400" />
-                  <span>Games Arcade</span>
-                </Link>
-                <Link
-                  href="/vault"
-                  onClick={() => setSearchOpen(false)}
-                  className="p-2.5 rounded-xl bg-white/5 hover:bg-[#f7cb73]/15 border border-white/5 hover:border-[#f7cb73]/40 text-gray-200 transition-all flex items-center gap-2"
-                >
-                  <BookOpen className="w-4 h-4 text-amber-400" />
-                  <span>Academic Vault</span>
-                </Link>
-                <Link
-                  href="/events"
-                  onClick={() => setSearchOpen(false)}
-                  className="p-2.5 rounded-xl bg-white/5 hover:bg-[#f7cb73]/15 border border-white/5 hover:border-[#f7cb73]/40 text-gray-200 transition-all flex items-center gap-2"
-                >
-                  <Calendar className="w-4 h-4 text-amber-400" />
-                  <span>College Events</span>
-                </Link>
-                <Link
-                  href="/recruitment"
-                  onClick={() => setSearchOpen(false)}
-                  className="p-2.5 rounded-xl bg-white/5 hover:bg-[#f7cb73]/15 border border-white/5 hover:border-[#f7cb73]/40 text-gray-200 transition-all flex items-center gap-2"
-                >
-                  <Rocket className="w-4 h-4 text-amber-400" />
-                  <span>Volunteering</span>
-                </Link>
+            {/* Dynamic Search Results */}
+            {trimmedQuery ? (
+              <div className="space-y-1.5 pt-1 max-h-72 overflow-y-auto no-scrollbar">
+                <div className="flex items-center justify-between pb-1.5 px-1 text-[11px] font-mono text-gray-400">
+                  <span>Search Results ({searchResults.length}):</span>
+                  <span className="text-[#f7cb73]">Press any to navigate</span>
+                </div>
+
+                {searchResults.length > 0 ? (
+                  searchResults.map((item, idx) => {
+                    const IconComponent = item.icon;
+                    return (
+                      <Link
+                        key={idx}
+                        href={item.href}
+                        onClick={() => {
+                          setSearchOpen(false);
+                          setSearchQuery('');
+                          sounds.playClick();
+                        }}
+                        className="p-3 rounded-xl bg-white/5 hover:bg-[#f7cb73]/15 border border-white/5 hover:border-[#f7cb73]/40 text-gray-200 transition-all flex items-center justify-between group"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-8 h-8 rounded-lg bg-[#f7cb73]/10 border border-[#f7cb73]/30 flex items-center justify-center text-[#f7cb73] shrink-0 group-hover:scale-105 transition-transform">
+                            <IconComponent className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="font-bold text-sm text-white group-hover:text-[#f7cb73] transition-colors truncate">
+                              {item.name}
+                            </div>
+                            <div className="text-[11px] text-gray-400 truncate">
+                              {item.desc}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0 ml-2">
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-black/40 border border-white/10 text-amber-300">
+                            {item.category}
+                          </span>
+                          <ArrowRight className="w-3.5 h-3.5 text-gray-500 group-hover:text-[#f7cb73] group-hover:translate-x-0.5 transition-all" />
+                        </div>
+                      </Link>
+                    );
+                  })
+                ) : (
+                  <div className="p-6 text-center text-xs text-gray-400 font-mono space-y-1 bg-white/5 rounded-xl border border-white/5">
+                    <div>No results found for &quot;{searchQuery}&quot;</div>
+                    <div className="text-[10px] text-gray-500">Try searching for &quot;chess&quot;, &quot;ludo&quot;, &quot;notes&quot;, &quot;dance&quot;, or &quot;events&quot;</div>
+                  </div>
+                )}
               </div>
-            </div>
+            ) : (
+              <div className="space-y-1.5 pt-1">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-gray-400 block mb-2">
+                  Quick Shortcuts:
+                </span>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <Link
+                    href="/games"
+                    onClick={() => { setSearchOpen(false); sounds.playClick(); }}
+                    className="p-2.5 rounded-xl bg-white/5 hover:bg-[#f7cb73]/15 border border-white/5 hover:border-[#f7cb73]/40 text-gray-200 transition-all flex items-center gap-2"
+                  >
+                    <Gamepad2 className="w-4 h-4 text-amber-400" />
+                    <span>Games Arcade</span>
+                  </Link>
+                  <Link
+                    href="/vault"
+                    onClick={() => { setSearchOpen(false); sounds.playClick(); }}
+                    className="p-2.5 rounded-xl bg-white/5 hover:bg-[#f7cb73]/15 border border-white/5 hover:border-[#f7cb73]/40 text-gray-200 transition-all flex items-center gap-2"
+                  >
+                    <BookOpen className="w-4 h-4 text-amber-400" />
+                    <span>Academic Vault</span>
+                  </Link>
+                  <Link
+                    href="/events"
+                    onClick={() => { setSearchOpen(false); sounds.playClick(); }}
+                    className="p-2.5 rounded-xl bg-white/5 hover:bg-[#f7cb73]/15 border border-white/5 hover:border-[#f7cb73]/40 text-gray-200 transition-all flex items-center gap-2"
+                  >
+                    <Calendar className="w-4 h-4 text-amber-400" />
+                    <span>College Events</span>
+                  </Link>
+                  <Link
+                    href="/recruitment"
+                    onClick={() => { setSearchOpen(false); sounds.playClick(); }}
+                    className="p-2.5 rounded-xl bg-white/5 hover:bg-[#f7cb73]/15 border border-white/5 hover:border-[#f7cb73]/40 text-gray-200 transition-all flex items-center gap-2"
+                  >
+                    <Rocket className="w-4 h-4 text-amber-400" />
+                    <span>Volunteering</span>
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

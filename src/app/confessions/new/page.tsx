@@ -59,6 +59,14 @@ export default function NewConfessionPage() {
       if (json.success) {
         sounds.playSuccess();
         triggerConfetti();
+        if (json.data && typeof window !== 'undefined') {
+          try {
+            const localList = JSON.parse(localStorage.getItem('dbuu_local_confessions') || '[]');
+            localList.unshift(json.data);
+            localStorage.setItem('dbuu_local_confessions', JSON.stringify(localList.slice(0, 50)));
+          } catch (e) {}
+        }
+        router.refresh();
         router.push('/confessions');
       } else {
         setErrorMsg(json.error || 'Failed to submit confession');

@@ -141,50 +141,29 @@ export default function HomePage() {
       </div>
 
       {/* ========================================================
-          HERO LANDING SECTION — WITH CLEAN HIGH-RES ARTWORK & SMOOTH SCALING
+          HERO LANDING SECTION — CLEAN & SHARP, EXACTLY LIKE GLOBAL SITE BG
           ======================================================== */}
       <section 
-        className="relative min-h-[100svh] w-full flex flex-col items-center px-3 sm:px-6 overflow-hidden select-none"
+        className="relative -mt-[58px] sm:-mt-[65px] pt-[68px] sm:pt-[78px] min-h-[100svh] w-full flex flex-col items-center px-3 sm:px-6 overflow-hidden select-none"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
-        {/* Multi-layered background with artwork selected for each screen size */}
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden flex items-center justify-center bg-[#0d0614]">
-          {/* Ambient glow layer */}
-          <picture className="absolute inset-0 w-full h-full pointer-events-none">
-            <source media="(max-width: 768px)" srcSet="/assets/hero-clean.webp" />
-            <source media="(min-width: 769px)" srcSet="/assets/hero-landscape.jpg" />
+        {/* Hero Background — Crisp single layer matching the site global background architecture */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          <picture className="w-full h-full">
+            {/* Mobile portrait framing */}
+            <source media="(max-width: 640px)" srcSet="/assets/hero-clean.webp" />
+            {/* Desktop landscape framing */}
+            <source media="(min-width: 641px)" srcSet="/assets/hero-landscape.jpg" />
             <img 
               src="/assets/hero-landscape.jpg" 
-              alt="" 
-              aria-hidden="true"
-              className="w-full h-full object-cover filter blur-3xl opacity-40 scale-110 pointer-events-none"
+              alt="DBUU Hub Students Fantasy Horizon" 
+              className="w-full h-full object-cover object-[center_28%] sm:object-center filter brightness-[0.96] contrast-[1.03] select-none"
             />
           </picture>
 
-          {/* Show the full portrait artwork on small screens and landscape artwork on desktop */}
-          <div className="relative w-full h-full mx-auto flex items-center justify-center">
-            <picture className="w-full h-full flex items-center justify-center">
-              <source media="(max-width: 768px)" srcSet="/assets/hero-clean.webp" />
-              <source media="(min-width: 769px)" srcSet="/assets/hero-landscape.jpg" />
-              <img 
-                src="/assets/hero-landscape.jpg" 
-                alt="DBUU Hub Students Fantasy Horizon" 
-                className="w-full h-full object-contain object-center filter brightness-[0.95] contrast-[1.04]"
-                style={{
-                  imageRendering: 'auto',
-                  WebkitBackfaceVisibility: 'hidden',
-                  transform: 'translateZ(0)'
-                }}
-              />
-            </picture>
-          </div>
-
-          {/* Top and Bottom Atmospheric Vignette Gradients for Text Legibility & Section Blending */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0b0710]/75 via-transparent via-50% to-[#0b0710] pointer-events-none" />
-          {/* Feathered side vignettes on ultra-wide desktop monitors to smoothly dissolve edges without pixelation */}
-          <div className="absolute inset-y-0 left-0 w-16 sm:w-28 lg:w-44 bg-gradient-to-r from-[#0b0710]/80 to-transparent pointer-events-none hidden sm:block" />
-          <div className="absolute inset-y-0 right-0 w-16 sm:w-28 lg:w-44 bg-gradient-to-l from-[#0b0710]/80 to-transparent pointer-events-none hidden sm:block" />
+          {/* Subtle atmospheric gradient overlay: enhances text contrast and smoothly fades into the page */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent via-50% to-[#0b0710] pointer-events-none" />
         </div>
 
         {/* 3D Pop-Up Perspective Container for Student Characters & Content */}
@@ -196,7 +175,7 @@ export default function HomePage() {
           }}
           className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center text-center animate-student-3d-pop"
         >
-          <div className="flex min-h-[calc(100svh-4rem)] w-full flex-col items-center justify-center py-12 sm:py-16">
+          <div className="flex min-h-[calc(100svh-6rem)] w-full flex-col items-center justify-center pt-2 sm:pt-4 pb-8 sm:pb-12">
             {/* Eyebrow Header with Star Dividers */}
             <div className="flex items-center justify-center gap-2 mb-1.5 sm:mb-2.5">
               <span className="text-[#f7cb73] text-xs sm:text-sm drop-shadow-[0_0_8px_rgba(247,203,115,0.8)]">✦</span>
@@ -382,10 +361,10 @@ export default function HomePage() {
             {/* Stat 2 */}
             <div className="flex flex-col items-center">
               <span className="font-serif font-black text-lg sm:text-2xl md:text-3xl text-[#fff3cb] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-                200+
+                20+
               </span>
               <span className="text-[9px] sm:text-xs text-gray-300 font-medium tracking-wider uppercase font-sans">
-                Resources
+                Courses
               </span>
             </div>
 
