@@ -18,13 +18,20 @@ import {
   UserCheck,
   LogIn,
   LogOut,
-  User
+  User,
+  Search,
+  Bell,
+  Menu,
+  Sparkles,
+  Rocket
 } from 'lucide-react';
 import { sounds } from '@/lib/utils';
 
 export default function Navbar() {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [soundActive, setSoundActive] = useState(true);
   const [currentUser, setCurrentUser] = useState<{ name: string; erpId?: string } | null>(null);
 
@@ -52,10 +59,13 @@ export default function Navbar() {
       .catch(() => {});
   }, [pathname]);
 
-  // Close sidebar on Escape key
+  // Close modals on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setSidebarOpen(false);
+      if (e.key === 'Escape') {
+        setSidebarOpen(false);
+        setSearchOpen(false);
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -68,15 +78,25 @@ export default function Navbar() {
     if (next) sounds.playClick();
   };
 
-  const navLinks = [
-    { name: 'Hub Home', href: '/', icon: Home, desc: 'Central University Scene' },
-    { name: 'Games Arcade', href: '/games', icon: Gamepad2, desc: 'Chess, Ludo, Sudoku, Speed Math', badge: 'Play AI & PvP' },
-    { name: 'Volunteering & Recruitment', href: '/recruitment', icon: Users, desc: 'DBUU Dance Ikon 2026 & Crews', badge: 'Dance Ikon' },
-    { name: 'Anonymous Confessions', href: '/confessions', icon: EyeOff, desc: '100% Identity Protected Whispers' },
-    { name: 'College Events', href: '/events', icon: Calendar, desc: 'Fests, Conclaves & Campus Meets' },
+  // Nav links matching the design in user image
+  const primaryLinks = [
+    { name: 'Home', href: '/', active: pathname === '/' },
+    { name: 'Hub', href: '/games', active: pathname.startsWith('/games') },
+    { name: 'Events', href: '/events', active: pathname.startsWith('/events') },
+    { name: 'Resources', href: '/vault', active: pathname.startsWith('/vault') },
+    { name: 'Community', href: '/confessions', active: pathname.startsWith('/confessions') || pathname.startsWith('/recruitment') },
+  ];
+
+  // Full drawer links for complete site navigation
+  const allNavLinks = [
+    { name: 'Home Landing', href: '/', icon: Home, desc: 'Central University Scene' },
+    { name: 'Games Arcade (Hub)', href: '/games', icon: Gamepad2, desc: 'Chess, Ludo, Sudoku, Speed Math', badge: 'Play AI & PvP' },
+    { name: 'Events & Conclaves', href: '/events', icon: Calendar, desc: 'Fests, Conclaves & Campus Meets' },
     { name: 'Add College Event', href: '/events/new', icon: PlusCircle, desc: 'Open for every student to host', highlight: true },
-    { name: 'Academic Vault', href: '/vault', icon: BookOpen, desc: 'Notes, Syllabus & PYQ Papers' },
-    { name: 'Student Profile', href: '/profile', icon: UserCheck, desc: 'Student Passport & Game Stats' },
+    { name: 'Academic Vault (Resources)', href: '/vault', icon: BookOpen, desc: 'Notes, Syllabus & PYQ Papers' },
+    { name: 'Community & Confessions', href: '/confessions', icon: EyeOff, desc: '100% Cryptographic Anonymity' },
+    { name: 'Volunteering & Opportunities', href: '/recruitment', icon: Rocket, desc: 'DBUU Dance Ikon 2026 & Crews', badge: 'Dance Ikon' },
+    { name: 'Student Profile & Stats', href: '/profile', icon: UserCheck, desc: 'Student Passport & Game Stats' },
   ];
 
   const handleLinkClick = () => {
@@ -95,85 +115,217 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Navbar - always solid black, responsive padding */}
-      <header className="sticky top-0 z-40 w-full bg-black border-b border-white/10 py-2.5 sm:py-3">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 md:px-10 flex items-center justify-between">
+      {/* Navbar — Styled exactly per the golden heraldic design */}
+      <header className="sticky top-0 z-40 w-full bg-[#0d0714]/90 backdrop-blur-md border-b border-[#f7cb73]/20 py-2.5 sm:py-3.5 transition-all shadow-[0_4px_25px_rgba(0,0,0,0.5)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 flex items-center justify-between">
           
-          {/* Minimalist Wordmark Logo */}
+          {/* Logo with Winged Crest and Golden Serif Wordmark */}
           <Link 
             href="/" 
             onClick={() => sounds.playClick()}
-            className="wordmark flex items-center gap-1.5 sm:gap-2 group focus:outline-none"
+            className="flex items-center gap-2.5 group focus:outline-none select-none"
           >
-            <span className="text-lg sm:text-2xl font-bold tracking-wider">DBUU</span>
-            <span className="text-[#ffc16b] font-light text-lg sm:text-2xl">HUB</span>
+            {/* Golden Winged Emblem */}
+            <div className="relative flex items-center justify-center">
+              <svg 
+                viewBox="0 0 54 36" 
+                className="w-8 h-6 sm:w-9 sm:h-7 drop-shadow-[0_2px_10px_rgba(247,203,115,0.65)] transition-transform duration-300 group-hover:scale-105" 
+                fill="none"
+              >
+                <defs>
+                  <linearGradient id="gold-grad-left" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#fff8db" />
+                    <stop offset="40%" stopColor="#f7cb73" />
+                    <stop offset="100%" stopColor="#b47818" />
+                  </linearGradient>
+                  <linearGradient id="gold-grad-right" x1="100%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#fff8db" />
+                    <stop offset="40%" stopColor="#f7cb73" />
+                    <stop offset="100%" stopColor="#b47818" />
+                  </linearGradient>
+                </defs>
+                {/* Central Star Crown */}
+                <path d="M27 6 L29 11 L34 11 L30 14 L31.5 19 L27 16 L22.5 19 L24 14 L20 11 L25 11 Z" fill="#fff5cc" />
+                {/* Left Feather Wings */}
+                <path d="M25 11 C18 5 9 4 3 8 C8 12 13 16 18 20 C20 16 23 13 25 11 Z" fill="url(#gold-grad-left)" />
+                <path d="M23 15 C17 10 9 10 5 14 C10 17 14 20 18 24 C20 20 22 17 23 15 Z" fill="url(#gold-grad-left)" opacity="0.85" />
+                <path d="M21 20 C16 16 10 16 7 20 C11 22 15 25 18 28 C20 24 21 22 21 20 Z" fill="url(#gold-grad-left)" opacity="0.7" />
+                {/* Right Feather Wings */}
+                <path d="M29 11 C36 5 45 4 51 8 C46 12 41 16 36 20 C34 16 31 13 29 11 Z" fill="url(#gold-grad-right)" />
+                <path d="M31 15 C37 10 45 10 49 14 C44 17 40 20 36 24 C34 20 32 17 31 15 Z" fill="url(#gold-grad-right)" opacity="0.85" />
+                <path d="M33 20 C38 16 44 16 47 20 C43 22 39 25 36 28 C34 24 33 22 33 20 Z" fill="url(#gold-grad-right)" opacity="0.7" />
+              </svg>
+            </div>
+
+            {/* Typography */}
+            <span className="font-serif font-black text-lg sm:text-2xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#fff7dd] via-[#f7cb73] to-[#d6962f] drop-shadow-[0_2px_8px_rgba(247,203,115,0.35)]">
+              DBUU HUB
+            </span>
           </Link>
 
-          {/* Right Action Controls */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Direct Add Event quick pill */}
-            <Link
-              href="/events/new"
-              onClick={() => sounds.playClick()}
-              className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#ffc16b]/40 bg-[#ffc16b]/10 hover:bg-[#ffc16b]/20 text-[#ffc16b] text-[11px] font-semibold tracking-wider uppercase transition-all"
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-7 lg:gap-9 text-sm font-medium">
+            {primaryLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                onClick={() => sounds.playClick()}
+                className={`transition-all duration-200 relative py-1 ${
+                  link.active
+                    ? 'text-[#fce3a4] font-semibold drop-shadow-[0_0_8px_rgba(247,203,115,0.5)] after:content-[""] after:absolute after:-bottom-1 after:left-0 after:right-0 after:h-[2px] after:bg-gradient-to-r after:from-transparent after:via-[#f7cb73] after:to-transparent'
+                    : 'text-gray-300 hover:text-[#f7cb73]'
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Right Action Icons */}
+          <div className="flex items-center gap-2.5 sm:gap-3.5">
+            {/* Search Button */}
+            <button
+              onClick={() => {
+                setSearchOpen(true);
+                sounds.playClick();
+              }}
+              title="Search DBUU Hub"
+              className="p-2 sm:p-2.5 rounded-full text-gray-300 hover:text-[#f7cb73] hover:bg-[#f7cb73]/10 transition-all border border-transparent hover:border-[#f7cb73]/30"
+              aria-label="Search"
             >
-              <PlusCircle className="w-3.5 h-3.5" />
-              <span>Add College Event</span>
+              <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            </button>
+
+            {/* Notification Bell */}
+            <Link
+              href="/events"
+              onClick={() => sounds.playClick()}
+              title="Campus Notifications"
+              className="p-2 sm:p-2.5 rounded-full text-gray-300 hover:text-[#f7cb73] hover:bg-[#f7cb73]/10 transition-all relative border border-transparent hover:border-[#f7cb73]/30"
+              aria-label="Notifications"
+            >
+              <Bell className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+              {/* Notification Pip */}
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#f97316] shadow-[0_0_6px_#f97316] animate-pulse" />
             </Link>
 
-            {/* Login / Profile */}
+            {/* Profile Avatar inside Golden Ring */}
             <Link
               href={currentUser ? "/profile" : "/auth/login"}
               onClick={() => sounds.playClick()}
-              className={`p-2 sm:p-2.5 rounded-full border transition-all backdrop-blur-sm flex items-center gap-1.5 ${
+              className={`p-1.5 sm:p-2 rounded-full border transition-all flex items-center gap-1.5 shadow-sm ${
                 currentUser 
-                  ? 'border-[#ffc16b]/50 bg-[#ffc16b]/15 text-[#ffc16b]' 
-                  : 'border-white/20 bg-black/40 hover:border-[#ffc16b]/60 text-white/80 hover:text-white'
+                  ? 'border-[#f7cb73] bg-[#f7cb73]/20 text-[#f7cb73] shadow-[0_0_12px_rgba(247,203,115,0.4)]' 
+                  : 'border-[#f7cb73]/60 bg-black/40 hover:border-[#f7cb73] text-[#f7cb73] hover:shadow-[0_0_10px_rgba(247,203,115,0.3)]'
               }`}
-              title={currentUser ? `Profile: ${currentUser.name}` : "Login / Register"}
+              title={currentUser ? `Signed in as ${currentUser.name}` : "Login / Sign in"}
+              aria-label="Profile"
             >
-              {currentUser ? (
-                <>
-                  <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ffc16b]" />
-                  <span className="hidden lg:inline text-xs font-mono font-bold text-white max-w-[100px] truncate">
-                    {currentUser.name}
-                  </span>
-                </>
-              ) : (
-                <LogIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <User className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#f7cb73]" />
+              {currentUser && (
+                <span className="hidden xl:inline text-xs font-mono font-bold text-white max-w-[90px] truncate pr-1">
+                  {currentUser.name}
+                </span>
               )}
             </Link>
 
-            {/* Audio Toggle */}
+            {/* Sound Toggle */}
             <button
               onClick={toggleSound}
               title={soundActive ? "Mute Sound Effects" : "Enable Sound Effects"}
-              className="p-2 sm:p-2.5 rounded-full border border-white/20 bg-black/40 hover:border-[#ffc16b]/60 text-white/80 hover:text-white transition-all backdrop-blur-sm"
+              className="p-2 sm:p-2.5 rounded-full border border-white/10 bg-black/30 hover:border-[#f7cb73]/50 text-gray-400 hover:text-white transition-all hidden sm:flex"
             >
-              {soundActive ? <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ffc16b]" /> : <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" />}
+              {soundActive ? <Volume2 className="w-4 h-4 text-[#f7cb73]" /> : <VolumeX className="w-4 h-4 text-gray-500" />}
             </button>
 
-            {/* Sidebar Drawer Trigger */}
+            {/* Mobile / Full Menu Drawer Trigger */}
             <button
               onClick={() => {
                 setSidebarOpen(true);
                 sounds.playClick();
               }}
-              className="menu-button"
+              className="p-2 rounded-xl border border-[#f7cb73]/40 bg-[#f7cb73]/10 hover:bg-[#f7cb73]/20 text-[#f7cb73] transition-all flex items-center gap-1.5 md:hidden"
               type="button"
               aria-label="Open Navigation Sidebar"
             >
-              <div className="hamburger-lines">
-                <span />
-                <span />
-              </div>
-              <span className="font-semibold text-[10px] sm:text-[11px] tracking-[0.2em]">MENU</span>
+              <Menu className="w-4 h-4" />
             </button>
           </div>
         </div>
       </header>
 
-      {/* Cyberpunk Sidebar Drawer Overlay */}
+      {/* Quick Search Dialog Modal */}
+      {searchOpen && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4 bg-black/80 backdrop-blur-md">
+          <div className="relative w-full max-w-lg bg-[#140b1e] border border-[#f7cb73]/40 rounded-2xl p-5 shadow-[0_0_40px_rgba(247,203,115,0.25)] space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2 text-[#f7cb73] font-serif font-bold text-base">
+                <Search className="w-4 h-4" />
+                <span>Search DBUU Nexus</span>
+              </div>
+              <button
+                onClick={() => setSearchOpen(false)}
+                className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="relative">
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search notes, events, clubs, games..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[#f7cb73]"
+              />
+            </div>
+
+            <div className="space-y-1.5 pt-1">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-gray-400 block mb-2">
+                Quick Shortcuts:
+              </span>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <Link
+                  href="/games"
+                  onClick={() => setSearchOpen(false)}
+                  className="p-2.5 rounded-xl bg-white/5 hover:bg-[#f7cb73]/15 border border-white/5 hover:border-[#f7cb73]/40 text-gray-200 transition-all flex items-center gap-2"
+                >
+                  <Gamepad2 className="w-4 h-4 text-amber-400" />
+                  <span>Games Arcade</span>
+                </Link>
+                <Link
+                  href="/vault"
+                  onClick={() => setSearchOpen(false)}
+                  className="p-2.5 rounded-xl bg-white/5 hover:bg-[#f7cb73]/15 border border-white/5 hover:border-[#f7cb73]/40 text-gray-200 transition-all flex items-center gap-2"
+                >
+                  <BookOpen className="w-4 h-4 text-amber-400" />
+                  <span>Academic Vault</span>
+                </Link>
+                <Link
+                  href="/events"
+                  onClick={() => setSearchOpen(false)}
+                  className="p-2.5 rounded-xl bg-white/5 hover:bg-[#f7cb73]/15 border border-white/5 hover:border-[#f7cb73]/40 text-gray-200 transition-all flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4 text-amber-400" />
+                  <span>College Events</span>
+                </Link>
+                <Link
+                  href="/recruitment"
+                  onClick={() => setSearchOpen(false)}
+                  className="p-2.5 rounded-xl bg-white/5 hover:bg-[#f7cb73]/15 border border-white/5 hover:border-[#f7cb73]/40 text-gray-200 transition-all flex items-center gap-2"
+                >
+                  <Rocket className="w-4 h-4 text-amber-400" />
+                  <span>Volunteering</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cyberpunk & Fantasy Sidebar Drawer Overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
           {/* Backdrop Blur */}
@@ -182,109 +334,118 @@ export default function Navbar() {
             onClick={() => setSidebarOpen(false)}
           />
 
-          {/* Drawer Content - Responsive width for phones */}
-          <div className="relative w-full max-w-[92vw] sm:max-w-md h-full bg-[#0d0813] border-l border-white/15 p-5 sm:p-8 flex flex-col justify-between shadow-2xl z-10 overflow-y-auto no-scrollbar">
+          {/* Drawer Content */}
+          <div className="relative w-full max-w-[92vw] sm:max-w-md h-full bg-[#0d0714] border-l border-[#f7cb73]/30 p-5 sm:p-7 flex flex-col justify-between shadow-2xl z-10 overflow-y-auto no-scrollbar">
             
             {/* Drawer Header */}
             <div>
-              <div className="flex items-center justify-between pb-5 border-b border-white/10">
-                <div className="wordmark text-xl sm:text-2xl">
-                  DBUU<span className="text-[#ffc16b]">.</span>HUB
+              <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <span className="font-serif font-black text-xl text-[#f7cb73]">
+                    DBUU HUB
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#f7cb73]/20 text-[#f7cb73] border border-[#f7cb73]/30 font-mono">
+                    NEXUS
+                  </span>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-2 rounded-full border border-white/20 hover:border-[#ffc16b] text-gray-400 hover:text-white transition-all"
+                  className="p-2 rounded-full border border-white/20 hover:border-[#f7cb73] text-gray-400 hover:text-white transition-all"
+                  aria-label="Close"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Logged in student info chip */}
-              {currentUser && (
-                <div className="mt-4 p-3 rounded-xl bg-[#ffc16b]/10 border border-[#ffc16b]/30 flex items-center justify-between">
-                  <div className="min-w-0">
-                    <span className="text-[10px] font-mono text-[#ffc16b] uppercase block">Authenticated Student</span>
-                    <p className="text-xs font-bold text-white truncate">{currentUser.name}</p>
-                    {currentUser.erpId && (
-                      <p className="text-[10px] font-mono text-gray-400">ERP: {currentUser.erpId}</p>
-                    )}
-                  </div>
-                  <Link
-                    href="/profile"
-                    onClick={handleLinkClick}
-                    className="px-2.5 py-1 rounded bg-[#ffc16b] text-black text-[10px] font-mono font-bold shrink-0"
-                  >
-                    VIEW
-                  </Link>
-                </div>
-              )}
+              {/* Navigation Links Grid */}
+              <nav className="mt-5 space-y-2">
+                {allNavLinks.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = pathname === link.href;
 
-              {/* Navigation Items */}
-              <div className="py-4 space-y-2">
-                {navLinks.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = pathname === item.href;
                   return (
                     <Link
-                      key={item.name}
-                      href={item.href}
+                      key={link.href}
+                      href={link.href}
                       onClick={handleLinkClick}
-                      className={`flex items-center justify-between p-3 sm:p-3.5 rounded-xl border transition-all ${
-                        item.highlight
-                          ? 'border-[#ffc16b]/50 bg-[#ffc16b]/10 text-[#ffc16b]'
-                          : isActive
-                          ? 'border-[#ffc16b]/40 bg-white/10 text-white'
-                          : 'border-white/5 bg-white/[0.02] text-gray-300 hover:bg-white/[0.06] hover:text-white hover:border-white/20'
+                      className={`group flex items-center justify-between p-3 rounded-xl transition-all border ${
+                        link.highlight
+                          ? 'border-[#f7cb73]/60 bg-[#f7cb73]/15 text-[#f7cb73] shadow-[0_0_15px_rgba(247,203,115,0.2)]'
+                          : isActive 
+                            ? 'border-[#f7cb73]/50 bg-white/10 text-white' 
+                            : 'border-white/5 hover:border-[#f7cb73]/30 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${item.highlight ? 'bg-[#ffc16b]/20 text-[#ffc16b]' : 'bg-white/5 text-[#ffc16b]'}`}>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`p-2 rounded-lg ${
+                          link.highlight 
+                            ? 'bg-[#f7cb73] text-black font-bold' 
+                            : isActive 
+                              ? 'bg-[#f7cb73]/20 text-[#f7cb73]' 
+                              : 'bg-black/50 text-gray-400 group-hover:text-[#f7cb73]'
+                        }`}>
                           <Icon className="w-4 h-4" />
                         </div>
-                        <div>
-                          <div className="text-xs sm:text-sm font-bold flex items-center gap-2">
-                            <span>{item.name}</span>
-                            {item.badge && (
-                              <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-mono">
-                                {item.badge}
+                        <div className="truncate">
+                          <div className="text-xs font-bold text-white tracking-wide flex items-center gap-2">
+                            <span>{link.name}</span>
+                            {link.badge && (
+                              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                {link.badge}
                               </span>
                             )}
                           </div>
-                          <p className="text-[10px] sm:text-[11px] text-gray-400 font-normal">{item.desc}</p>
+                          <span className="text-[10px] text-gray-400 block truncate">
+                            {link.desc}
+                          </span>
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-gray-500 shrink-0" />
+                      <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-[#f7cb73] group-hover:translate-x-0.5 transition-all shrink-0" />
                     </Link>
                   );
                 })}
-              </div>
+              </nav>
             </div>
 
             {/* Drawer Footer */}
-            <div className="pt-4 border-t border-white/10 text-xs text-gray-500 space-y-3">
+            <div className="pt-6 border-t border-white/10 mt-6 space-y-3">
               {currentUser ? (
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout Account ({currentUser.name})</span>
-                </button>
+                <div className="space-y-2">
+                  <div className="p-3 rounded-xl bg-black/40 border border-[#f7cb73]/30 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5 truncate">
+                      <div className="w-8 h-8 rounded-full bg-[#f7cb73]/20 border border-[#f7cb73]/50 flex items-center justify-center text-[#f7cb73] font-bold text-xs">
+                        {currentUser.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="truncate text-xs">
+                        <div className="font-bold text-white truncate">{currentUser.name}</div>
+                        {currentUser.erpId && (
+                          <div className="text-[10px] font-mono text-cyan-400">ERP: {currentUser.erpId}</div>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="p-1.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
+                      title="Sign Out"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
               ) : (
                 <Link
                   href="/auth/login"
                   onClick={handleLinkClick}
-                  className="flex items-center gap-2 text-[#ffc16b] hover:underline"
+                  className="w-full py-2.5 rounded-xl border border-[#f7cb73] bg-gradient-to-r from-amber-600/40 via-amber-500/50 to-amber-600/40 hover:bg-amber-500/60 text-[#fff4d1] font-bold text-xs flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(247,203,115,0.25)] transition-all"
                 >
                   <LogIn className="w-4 h-4" />
-                  <span>Student Login with ERP ID</span>
+                  <span>Sign In with ERP ID</span>
                 </Link>
               )}
-              <p className="text-[11px] text-gray-500">Dev Bhoomi Uttarakhand University</p>
-              <div className="text-[10px] sm:text-[11px] text-emerald-400 flex items-center gap-1.5 font-mono">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Open-Source Campus Hub Live</span>
-              </div>
+
+              <p className="text-[10px] text-center text-gray-500 font-mono">
+                Dev Bhoomi Uttarakhand University • DBUU HUB
+              </p>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Manrope:wght@400;500;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -581,6 +581,61 @@
   .scroll-cue {
     display: none;
   }
+}
+
+@keyframes goti-dance {
+  0%, 100% {
+    transform: translateY(0) scale(1.15);
+  }
+  50% {
+    transform: translateY(-9px) scale(1.25);
+  }
+}
+
+.animate-goti-dance {
+  animation: goti-dance 0.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes student-3d-pop {
+  0% {
+    opacity: 0;
+    transform: perspective(1200px) translateY(50px) translateZ(-80px) rotateX(10deg) scale(0.92);
+    filter: brightness(0.7) blur(4px);
+  }
+  60% {
+    opacity: 1;
+    transform: perspective(1200px) translateY(-10px) translateZ(30px) rotateX(-2deg) scale(1.02);
+    filter: brightness(1.15) blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1200px) translateY(0) translateZ(0) rotateX(0deg) scale(1);
+    filter: brightness(1) blur(0px);
+  }
+}
+
+.animate-student-3d-pop {
+  animation: student-3d-pop 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+@keyframes orbital-glow-spin {
+  0% {
+    transform: rotate(0deg) scaleY(0.45);
+  }
+  100% {
+    transform: rotate(360deg) scaleY(0.45);
+  }
+}
+
+.animate-orbital-glow {
+  animation: orbital-glow-spin 12s linear infinite;
+  transform-origin: center center;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', Georgia, serif;
 }
 
 @media (prefers-reduced-motion: reduce) {

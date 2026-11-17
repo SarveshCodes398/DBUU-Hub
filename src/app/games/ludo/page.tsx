@@ -112,7 +112,7 @@ const COLOR_THEMES: Record<PlayerColor, {
   blue: { name: 'Blue Cyber', bgHex: '#2563EB', borderHex: '#1E3A8A', badge: 'bg-sky-500/20 text-sky-300 border-sky-500/40', emoji: '🔵' }
 };
 
-// 3D Teardrop Map-Pin Component (Large, crisp, sitting steadily without dancing/bouncing)
+// 3D Teardrop Map-Pin Component (Large, crisp, sitting steadily with active dance when selectable)
 function LudoPinGoti({ 
   color, 
   canMove, 
@@ -125,8 +125,8 @@ function LudoPinGoti({
   const theme = COLOR_THEMES[color];
 
   return (
-    <div className={`w-full h-full relative select-none flex items-center justify-center transition-transform duration-150 ${
-      canMove ? 'hover:scale-110' : ''
+    <div className={`w-full h-full relative select-none flex items-center justify-center transition-all duration-150 ${
+      canMove ? 'animate-goti-dance drop-shadow-[0_0_14px_rgba(251,191,36,0.95)]' : ''
     }`}>
       <svg 
         viewBox="0 0 38 48" 
@@ -176,18 +176,30 @@ function LudoPinGoti({
           transform="rotate(-25 16 15)" 
         />
 
-        {/* Calm Non-Bouncing Selection Ring when movable */}
+        {/* Active Dancing Selection Aura Ring */}
         {canMove && (
-          <circle 
-            cx="19" 
-            cy="19" 
-            r="13.5" 
-            fill="none" 
-            stroke="#FBBF24" 
-            strokeWidth="2.5" 
-            opacity="0.95"
-            className="animate-pulse" 
-          />
+          <>
+            <circle 
+              cx="19" 
+              cy="19" 
+              r="14" 
+              fill="none" 
+              stroke="#FBBF24" 
+              strokeWidth="3" 
+              opacity="0.95"
+              className="animate-pulse" 
+            />
+            {/* Sparkle golden crown atop the pin */}
+            <circle 
+              cx="19" 
+              cy="2" 
+              r="3.5" 
+              fill="#FDE047" 
+              stroke="#B45309"
+              strokeWidth="1"
+              className="animate-ping"
+            />
+          </>
         )}
       </svg>
     </div>
@@ -942,48 +954,100 @@ export default function LudoPage() {
               })}
             </div>
 
-            {/* TOKENS - LARGE 3D TEARDROP MAP-PINS, STEADY WITH NO BOUNCING */}
-            {tokens.map(token => {
-              if (!activeColors.includes(token.color)) return null;
+            {/* TOKENS - LARGE 3D TEARDROP MAP-PINS WITH ACTIVE CELL OVERLAP RESOLUTION & DANCING SELECTION */}
+            {(() => {
+              // Pre-calculate token positions on board to fan out overlapping pieces
+              const cellMap: Record<string, Token[]> = {};
+              tokens.forEach(t => {
+                if (!activeColors.includes(t.color)) return;
+                if (t.step === -1) {
+                  cellMap[`yard_${t.color}_${t.id % 4}`] = [t];
+                } else {
+                  const c = getTokenCoordsPct(t);
+                  const key = `cell_${c.x.toFixed(1)}_${c.y.toFixed(1)}`;
+                  if (!cellMap[key]) cellMap[key] = [];
+                  cellMap[key].push(t);
+                }
+              });
 
-              const coords = getTokenCoordsPct(token);
-              const isCurrentTurnToken = token.color === activeColor;
-              const canMove = hasRolled && !isMoving && !winner && isMyTurn() && (
-                (token.step === -1 && diceValue === 6) ||
-                (token.step >= 0 && token.step + diceValue <= 56)
-              );
-              const isThisMoving = activeMovingTokenId === token.id;
+              return tokens.map(token => {
+                if (!activeColors.includes(token.color)) return null;
 
-              return (
-                <div
-                  key={token.id}
-                  onClick={() => {
-                    if (isCurrentTurnToken && canMove && (!isCurrentBot || gameMode !== 'bot')) {
-                      moveTokenAnimated(token.id);
-                    }
-                  }}
-                  style={{
-                    left: `${coords.x}%`,
-                    top: `${coords.y}%`,
-                    transform: isThisMoving 
-                      ? 'translate(-50%, -90%) scale(1.15)' 
-                      : 'translate(-50%, -75%)',
-                    width: '8.4%',
-                    height: '11.5%',
-                    transition: isThisMoving 
-                      ? 'all 100ms cubic-bezier(0.34, 1.56, 0.64, 1)' 
-                      : 'all 160ms ease-out'
-                  }}
-                  className={`absolute z-30 cursor-pointer flex items-center justify-center`}
-                >
-                  <LudoPinGoti 
-                    color={token.color} 
-                    canMove={canMove} 
-                    isMoving={isThisMoving} 
-                  />
-                </div>
-              );
-            })}
+                const coords = getTokenCoordsPct(token);
+                const isCurrentTurnToken = token.color === activeColor;
+                const canMove = hasRolled && !isMoving && !winner && isMyTurn() && (
+                  (token.step === -1 && diceValue === 6) ||
+                  (token.step >= 0 && token.step + diceValue <= 56)
+                );
+                const isThisMoving = activeMovingTokenId === token.id;
+
+                // Overlap calculation: when two different gotis are at the same place, stagger them
+                const cellKey = token.step === -1 
+                  ? `yard_${token.color}_${token.id % 4}`
+                  : `cell_${coords.x.toFixed(1)}_${coords.y.toFixed(1)}`;
+                const occupants = cellMap[cellKey] || [token];
+                const occupantIndex = occupants.findIndex(t => t.id === token.id);
+                const count = occupants.length;
+
+                let dx = 0;
+                let dy = 0;
+                if (count > 1 && token.step >= 0) {
+                  if (count === 2) {
+                    dx = occupantIndex === 0 ? -1.6 : 1.6;
+                    dy = occupantIndex === 0 ? -1.2 : 1.2;
+                  } else if (count === 3) {
+                    if (occupantIndex === 0) { dx = -1.8; dy = -1.2; }
+                    else if (occupantIndex === 1) { dx = 1.8; dy = -1.2; }
+                    else { dx = 0; dy = 1.6; }
+                  } else {
+                    dx = (occupantIndex % 2 === 0 ? -1.8 : 1.8);
+                    dy = occupantIndex < 2 ? -1.5 : 1.5;
+                  }
+                }
+
+                // If this piece is movable, bring to FRONT z-50 with active dancing aura
+                // Non-movable opponent tokens have pointer-events-none so they never steal the active player's click!
+                const zIndexClass = isThisMoving 
+                  ? 'z-50' 
+                  : canMove 
+                    ? 'z-40' 
+                    : isCurrentTurnToken 
+                      ? 'z-30' 
+                      : 'z-20 pointer-events-none opacity-80';
+
+                return (
+                  <div
+                    key={token.id}
+                    onClick={() => {
+                      if (isCurrentTurnToken && canMove && (!isCurrentBot || gameMode !== 'bot')) {
+                        moveTokenAnimated(token.id);
+                      }
+                    }}
+                    style={{
+                      left: `${coords.x + dx}%`,
+                      top: `${coords.y + dy}%`,
+                      transform: isThisMoving 
+                        ? 'translate(-50%, -90%) scale(1.18)' 
+                        : canMove
+                          ? 'translate(-50%, -80%) scale(1.12)'
+                          : 'translate(-50%, -75%)',
+                      width: '8.4%',
+                      height: '11.5%',
+                      transition: isThisMoving 
+                        ? 'all 100ms cubic-bezier(0.34, 1.56, 0.64, 1)' 
+                        : 'all 160ms ease-out'
+                    }}
+                    className={`absolute ${zIndexClass} ${canMove ? 'cursor-pointer' : 'cursor-default'} flex items-center justify-center`}
+                  >
+                    <LudoPinGoti 
+                      color={token.color} 
+                      canMove={canMove} 
+                      isMoving={isThisMoving} 
+                    />
+                  </div>
+                );
+              });
+            })()}
 
           </div>
         </div>
